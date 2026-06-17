@@ -151,6 +151,20 @@ def cmd_search(args):
         except Exception as e: print(f"warning: {fn.__name__} failed: {e}", file=sys.stderr)
     new=append_results(items, args.query); print(f"saved {len(new)} new / {len(items)} total candidate records to {RESULTS}")
 
+
+def cmd_ingest(args):
+    src = Path(args.file)
+    if not src.exists():
+        raise SystemExit(f"seed file not found: {src}")
+    text = src.read_text(encoding="utf-8")
+    if src.suffix.lower() == ".jsonl":
+        items = [json.loads(line) for line in text.splitlines() if line.strip()]
+    else:
+        loaded = json.loads(text)
+        items = loaded.get("records", loaded) if isinstance(loaded, dict) else loaded
+    new = append_results(items, getattr(args, "query", "manual-ingest"))
+    print(f"ingested {len(new)} new / {len(items)} supplied records from {src}")
+
 def cmd_fetch(args):
     PAPERS.mkdir(exist_ok=True); count=0
     for p in load_results():
@@ -220,6 +234,7 @@ def main():
     ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest="cmd", required=True)
     for c in ["search","update"]:
         p=sub.add_parser(c); p.add_argument("--query", required=True); p.add_argument("--limit", type=int, default=10); p.set_defaults(func=cmd_search if c=="search" else cmd_update)
+    p=sub.add_parser("ingest"); p.add_argument("--file", required=True); p.add_argument("--query", default="manual-ingest"); p.set_defaults(func=cmd_ingest)
     for c,fn in [("fetch",cmd_fetch),("summarize",cmd_summarize),("organize",cmd_organize),("matrix",cmd_matrix),("report",cmd_report)]:
         p=sub.add_parser(c); p.add_argument("--all", action="store_true"); p.set_defaults(func=fn)
     args=ap.parse_args(); args.func(args)

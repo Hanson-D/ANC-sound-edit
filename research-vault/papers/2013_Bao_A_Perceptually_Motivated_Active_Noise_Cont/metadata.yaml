@@ -1,0 +1,24 @@
+title: "A Perceptually Motivated Active Noise Control Design and Its Psychoacoustic Analysis"
+authors:
+  - "Hua Bao"
+  - "Issa M. S. Panahi"
+year: 2013
+venue: "ETRI Journal"
+doi: "10.4218/etrij.13.0112.0822"
+url: "https://onlinelibrary.wiley.com/doi/abs/10.4218/etrij.13.0112.0822"
+source: "manual_seed_crossref_web"
+abstract: "Traditional ANC minimizes residual noise energy without frequency discrimination, but human hearing has selective frequency sensitivity. The paper incorporates noise weighting into ANC and evaluates residual noise by a pleasantness model combining loudness, sharpness, roughness, and tonality; summaries report ITU-R 468 can outperform A-weighting."
+citation_count: 
+keywords:
+  - "ANC"
+  - "perceptual weighting"
+  - "pleasantness"
+  - "loudness"
+  - "sharpness"
+  - "roughness"
+  - "tonality"
+arxiv_id: ""
+pmid: ""
+pdf_url: "https://koreascience.kr/article/JAKO201373959966137.pdf"
+retrieved_at: "2026-06-17T05:11:02.785599Z"
+query: "ANC comfort Bark loudness spectral modulation"

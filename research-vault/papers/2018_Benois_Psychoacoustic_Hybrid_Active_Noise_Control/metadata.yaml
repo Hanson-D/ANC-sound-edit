@@ -1,0 +1,24 @@
+title: "Psychoacoustic Hybrid Active Noise Control Structure for Application in Headphones"
+authors:
+  - "Piero Rivera Benois"
+  - "Veatriki Papantoni"
+  - "Udo Zölzer"
+year: 2018
+venue: "25th International Congress on Sound and Vibration"
+doi: ""
+url: "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf"
+source: "manual_seed_open_pdf"
+abstract: "Psychoacoustic ANC aims to reduce perceived loudness and annoyance by prioritizing frequencies where human hearing is more sensitive. A hybrid headphone structure combines psychoacoustic feedforward control with feedback low-frequency attenuation; measurements on a prototype show passive attenuation dominates pleasantness but ANC further reduces loudness and roughness."
+citation_count: 
+keywords:
+  - "ANC headphones"
+  - "hybrid control"
+  - "psychoacoustics"
+  - "loudness"
+  - "roughness"
+  - "sharpness"
+arxiv_id: ""
+pmid: ""
+pdf_url: "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf"
+retrieved_at: "2026-06-17T05:11:02.785859Z"
+query: "ANC comfort Bark loudness spectral modulation"

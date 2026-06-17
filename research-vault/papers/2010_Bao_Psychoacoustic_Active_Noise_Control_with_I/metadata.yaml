@@ -1,0 +1,24 @@
+title: "Psychoacoustic Active Noise Control with ITU-R 468 Noise Weighting and its Sound Quality Analysis"
+authors:
+  - "Hua Bao"
+  - "Issa M. S. Panahi"
+year: 2010
+venue: "Annual International Conference of the IEEE Engineering in Medicine and Biology Society"
+doi: "10.1109/IEMBS.2010.5626197"
+url: "https://pubmed.ncbi.nlm.nih.gov/21095758/"
+source: "manual_seed_pubmed_web"
+abstract: "Applies ITU-R 468 noise weighting to psychoacoustic ANC and evaluates residual noise sound quality using a comfort model with loudness, roughness, sharpness, and tonality; related summaries report that reducing level alone does not necessarily reduce annoyance."
+citation_count: 
+keywords:
+  - "ANC"
+  - "ITU-R 468"
+  - "sound quality"
+  - "loudness"
+  - "sharpness"
+  - "roughness"
+  - "tonality"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:11:02.785567Z"
+query: "ANC comfort Bark loudness spectral modulation"

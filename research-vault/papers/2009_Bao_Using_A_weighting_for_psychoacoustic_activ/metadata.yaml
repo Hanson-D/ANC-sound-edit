@@ -1,0 +1,22 @@
+title: "Using A-weighting for psychoacoustic active noise control"
+authors:
+  - "Hua Bao"
+  - "Issa M. S. Panahi"
+year: 2009
+venue: "Annual International Conference of the IEEE Engineering in Medicine and Biology Society"
+doi: "10.1109/IEMBS.2009.5332654"
+url: "https://pubmed.ncbi.nlm.nih.gov/19963645/"
+source: "manual_seed_pubmed_web"
+abstract: "Incorporates A-weighting into adaptive active noise cancellation from a psychoacoustic point of view so residual noise control better reflects human hearing sensitivity than unweighted energy minimization."
+citation_count: 
+keywords:
+  - "ANC"
+  - "psychoacoustics"
+  - "A-weighting"
+  - "loudness"
+  - "comfort"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:11:02.785481Z"
+query: "ANC comfort Bark loudness spectral modulation"

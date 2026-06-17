@@ -14,6 +14,7 @@
 
 ```bash
 python research-vault/tools/lit_workflow.py search --query "active noise control adaptive filtering" --limit 10
+python research-vault/tools/lit_workflow.py ingest --file research-vault/seeds/anc_comfort_bark_seed.json --query "ANC comfort Bark loudness spectral modulation"
 python research-vault/tools/lit_workflow.py fetch
 python research-vault/tools/lit_workflow.py summarize --all
 python research-vault/tools/lit_workflow.py organize
@@ -25,6 +26,7 @@ python research-vault/tools/lit_workflow.py update --query "your new query" --li
 ## 命令
 
 - `search`: 根据主题/关键词/研究问题/种子 ID 检索 arXiv、PubMed、Semantic Scholar、OpenAlex、Crossref、bioRxiv/medRxiv，并保存 JSONL 结果与搜索日志。
+- `ingest`: 在网络/API 受限时导入人工核对过的 JSON/JSONL 种子记录，仍走后续 fetch/summarize/organize/matrix/report 流水线。
 - `fetch`: 标准化元数据，按论文生成目录；如发现开放 PDF，下载到 `paper.pdf`。
 - `summarize`: 对单篇或全部论文生成结构化阅读笔记；没有全文时明确标注基于摘要。
 - `organize`: 去重、生成 paper note、主题/方法/理论索引、OKF/Obsidian 友好 Markdown。
