@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Extends psychoacoustic ANC beyond frequency-dependent hearing thresholds by considering spectral modulation sensitivity. The proposed pre-emphasis filter shapes residual error and is evaluated by SPL and loudness level, outperforming compared systems in simulations under narrowband and broadband noise and validated on DSP hardware.

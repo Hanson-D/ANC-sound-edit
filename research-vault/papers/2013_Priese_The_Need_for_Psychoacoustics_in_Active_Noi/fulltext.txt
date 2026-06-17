@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Argues that high noise reduction alone is insufficient for ANC headphone comfort; test-person evaluation indicates perceived loudness is not the only factor and pleasantness is important. The paper highlights human sensitivity around 2 kHz to 5 kHz and the need to design ANC using psychoacoustic properties.

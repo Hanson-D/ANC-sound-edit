@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Applies ITU-R 468 noise weighting to psychoacoustic ANC and evaluates residual noise sound quality using a comfort model with loudness, roughness, sharpness, and tonality; related summaries report that reducing level alone does not necessarily reduce annoyance.

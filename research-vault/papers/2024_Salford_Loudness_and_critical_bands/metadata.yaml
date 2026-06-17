@@ -1,0 +1,21 @@
+title: "Loudness and critical bands"
+authors:
+  - "Acoustics Innovation Institute, University of Salford"
+year: 2024
+venue: "University of Salford Psychoacoustics Knowledge Base"
+doi: ""
+url: "https://acoustics.salford.ac.uk/psychoacoustics/sound-quality-making-products-sound-better/an-introduction-to-sound-quality-testing/loudness/"
+source: "manual_seed_web_reference"
+abstract: "Explains that equal-loudness contours show low-frequency tones need more sound power to be as loud as 1 kHz, and complex sound loudness requires critical bandwidths because tones within less than one critical bandwidth partly mask each other. Proper critical-band loudness is more perceptually meaningful than dB(A) alone."
+citation_count: 
+keywords:
+  - "Bark"
+  - "critical bands"
+  - "loudness summation"
+  - "masking"
+  - "equal-loudness"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:11:02.785901Z"
+query: "ANC comfort Bark loudness spectral modulation"
