@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Foundational psychoacoustics reference for Bark scale, critical bands, masking, loudness, sharpness, and roughness.

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Traditional ANC minimizes residual noise energy without frequency discrimination, but human hearing has selective frequency sensitivity. The paper incorporates noise weighting into ANC and evaluates residual noise by a pleasantness model combining loudness, sharpness, roughness, and tonality; summaries report ITU-R 468 can outperform A-weighting.

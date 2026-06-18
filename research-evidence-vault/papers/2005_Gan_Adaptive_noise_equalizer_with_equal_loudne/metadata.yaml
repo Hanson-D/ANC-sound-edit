@@ -1,0 +1,21 @@
+title: "Adaptive noise equalizer with equal-loudness compensation"
+authors:
+  - "Woon-Seng Gan"
+  - "Sen M. Kuo"
+  - "J. W. Feng"
+year: 2005
+venue: "IEEE International Symposium on Circuits and Systems"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/1464605"
+source: "large_validation_seed"
+abstract: "Uses equal-loudness compensation in an adaptive noise equalizer, directly related to perceptual weighting."
+citation_count: 
+keywords:
+  - "equal loudness"
+  - "noise equalizer"
+  - "ANC"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132818Z"
+query: "large validation ANC comfort Bark loudness sound quality"

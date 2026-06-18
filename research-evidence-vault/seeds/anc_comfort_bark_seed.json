@@ -1,0 +1,93 @@
+[
+  {
+    "title": "Using A-weighting for psychoacoustic active noise control",
+    "authors": ["Hua Bao", "Issa M. S. Panahi"],
+    "year": 2009,
+    "venue": "Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    "doi": "10.1109/IEMBS.2009.5332654",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19963645/",
+    "abstract": "Incorporates A-weighting into adaptive active noise cancellation from a psychoacoustic point of view so residual noise control better reflects human hearing sensitivity than unweighted energy minimization.",
+    "citation_count": null,
+    "source": "manual_seed_pubmed_web",
+    "keywords": ["ANC", "psychoacoustics", "A-weighting", "loudness", "comfort"],
+    "pdf_url": ""
+  },
+  {
+    "title": "Psychoacoustic Active Noise Control with ITU-R 468 Noise Weighting and its Sound Quality Analysis",
+    "authors": ["Hua Bao", "Issa M. S. Panahi"],
+    "year": 2010,
+    "venue": "Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    "doi": "10.1109/IEMBS.2010.5626197",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/21095758/",
+    "abstract": "Applies ITU-R 468 noise weighting to psychoacoustic ANC and evaluates residual noise sound quality using a comfort model with loudness, roughness, sharpness, and tonality; related summaries report that reducing level alone does not necessarily reduce annoyance.",
+    "citation_count": null,
+    "source": "manual_seed_pubmed_web",
+    "keywords": ["ANC", "ITU-R 468", "sound quality", "loudness", "sharpness", "roughness", "tonality"],
+    "pdf_url": ""
+  },
+  {
+    "title": "A Perceptually Motivated Active Noise Control Design and Its Psychoacoustic Analysis",
+    "authors": ["Hua Bao", "Issa M. S. Panahi"],
+    "year": 2013,
+    "venue": "ETRI Journal",
+    "doi": "10.4218/etrij.13.0112.0822",
+    "url": "https://onlinelibrary.wiley.com/doi/abs/10.4218/etrij.13.0112.0822",
+    "abstract": "Traditional ANC minimizes residual noise energy without frequency discrimination, but human hearing has selective frequency sensitivity. The paper incorporates noise weighting into ANC and evaluates residual noise by a pleasantness model combining loudness, sharpness, roughness, and tonality; summaries report ITU-R 468 can outperform A-weighting.",
+    "citation_count": null,
+    "source": "manual_seed_crossref_web",
+    "keywords": ["ANC", "perceptual weighting", "pleasantness", "loudness", "sharpness", "roughness", "tonality"],
+    "pdf_url": "https://koreascience.kr/article/JAKO201373959966137.pdf"
+  },
+  {
+    "title": "The Need for Psychoacoustics in Active Noise Cancellation",
+    "authors": ["Sebastian Priese", "Carsten Bruhnken", "Daniel Voss", "Eckhard Reithmeier"],
+    "year": 2013,
+    "venue": "AIA-DAGA 2013 International Conference on Acoustics",
+    "doi": "",
+    "url": "https://www.imr.uni-hannover.de/fileadmin/imr/Forschung/Publikationen_bak/000377.pdf",
+    "abstract": "Argues that high noise reduction alone is insufficient for ANC headphone comfort; test-person evaluation indicates perceived loudness is not the only factor and pleasantness is important. The paper highlights human sensitivity around 2 kHz to 5 kHz and the need to design ANC using psychoacoustic properties.",
+    "citation_count": null,
+    "source": "manual_seed_open_pdf",
+    "keywords": ["ANC headphones", "comfort", "pleasantness", "loudness", "equal-loudness", "2-5 kHz"],
+    "pdf_url": "https://www.imr.uni-hannover.de/fileadmin/imr/Forschung/Publikationen_bak/000377.pdf"
+  },
+  {
+    "title": "A Spectral Modulation Sensitivity Weighted Pre-emphasis Filter for Active Noise Control System",
+    "authors": ["Kah-Meng Cheong", "Yuh-Yuan Wang", "Tai-Shih Chi"],
+    "year": 2016,
+    "venue": "Interspeech 2016",
+    "doi": "10.21437/Interspeech.2016-1315",
+    "url": "https://www.isca-archive.org/interspeech_2016/cheong16_interspeech.html",
+    "abstract": "Extends psychoacoustic ANC beyond frequency-dependent hearing thresholds by considering spectral modulation sensitivity. The proposed pre-emphasis filter shapes residual error and is evaluated by SPL and loudness level, outperforming compared systems in simulations under narrowband and broadband noise and validated on DSP hardware.",
+    "citation_count": null,
+    "source": "manual_seed_isca_web",
+    "keywords": ["ANC", "spectral modulation", "Bark relationship", "loudness", "residual shaping"],
+    "pdf_url": "https://www.isca-archive.org/interspeech_2016/cheong16_interspeech.pdf"
+  },
+  {
+    "title": "Psychoacoustic Hybrid Active Noise Control Structure for Application in Headphones",
+    "authors": ["Piero Rivera Benois", "Veatriki Papantoni", "Udo Zölzer"],
+    "year": 2018,
+    "venue": "25th International Congress on Sound and Vibration",
+    "doi": "",
+    "url": "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf",
+    "abstract": "Psychoacoustic ANC aims to reduce perceived loudness and annoyance by prioritizing frequencies where human hearing is more sensitive. A hybrid headphone structure combines psychoacoustic feedforward control with feedback low-frequency attenuation; measurements on a prototype show passive attenuation dominates pleasantness but ANC further reduces loudness and roughness.",
+    "citation_count": null,
+    "source": "manual_seed_open_pdf",
+    "keywords": ["ANC headphones", "hybrid control", "psychoacoustics", "loudness", "roughness", "sharpness"],
+    "pdf_url": "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf"
+  },
+  {
+    "title": "Loudness and critical bands",
+    "authors": ["Acoustics Innovation Institute, University of Salford"],
+    "year": 2024,
+    "venue": "University of Salford Psychoacoustics Knowledge Base",
+    "doi": "",
+    "url": "https://acoustics.salford.ac.uk/psychoacoustics/sound-quality-making-products-sound-better/an-introduction-to-sound-quality-testing/loudness/",
+    "abstract": "Explains that equal-loudness contours show low-frequency tones need more sound power to be as loud as 1 kHz, and complex sound loudness requires critical bandwidths because tones within less than one critical bandwidth partly mask each other. Proper critical-band loudness is more perceptually meaningful than dB(A) alone.",
+    "citation_count": null,
+    "source": "manual_seed_web_reference",
+    "keywords": ["Bark", "critical bands", "loudness summation", "masking", "equal-loudness"],
+    "pdf_url": ""
+  }
+]

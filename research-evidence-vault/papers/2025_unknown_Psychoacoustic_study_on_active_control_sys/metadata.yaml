@@ -1,0 +1,20 @@
+title: "Psychoacoustic study on active control system for kitchen hoods noise"
+authors:
+  - "unknown"
+year: 2025
+venue: "Journal of Low Frequency Noise, Vibration and Active Control"
+doi: "10.1177/14613484251403243"
+url: "https://journals.sagepub.com/doi/10.1177/14613484251403243"
+source: "large_validation_seed"
+abstract: "Recent real-time shaping ANC for kitchen hood noise using psychoacoustic measures; reinforces pleasant residual sound target."
+citation_count: 
+keywords:
+  - "ANC"
+  - "psychoacoustics"
+  - "kitchen hood"
+  - "pleasantness"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.133225Z"
+query: "large validation ANC comfort Bark loudness sound quality"

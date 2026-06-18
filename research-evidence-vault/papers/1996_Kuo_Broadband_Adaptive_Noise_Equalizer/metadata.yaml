@@ -1,0 +1,20 @@
+title: "Broadband Adaptive Noise Equalizer"
+authors:
+  - "Sen M. Kuo"
+  - "Y. Yang"
+year: 1996
+venue: "IEEE Signal Processing Letters"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/535352"
+source: "large_validation_seed"
+abstract: "Adaptive noise equalizer for broadband residual sound shaping; related to user-preferred residual spectra."
+citation_count: 
+keywords:
+  - "active noise equalizer"
+  - "broadband"
+  - "spectral shaping"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132741Z"
+query: "large validation ANC comfort Bark loudness sound quality"

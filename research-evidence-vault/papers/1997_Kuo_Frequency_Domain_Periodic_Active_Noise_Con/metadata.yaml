@@ -1,0 +1,21 @@
+title: "Frequency-Domain Periodic Active Noise Control and Equalization"
+authors:
+  - "Sen M. Kuo"
+  - "M. Tahernezhadi"
+  - "Li Ji"
+year: 1997
+venue: "IEEE Transactions on Speech and Audio Processing"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/595748"
+source: "large_validation_seed"
+abstract: "Frequency-domain periodic ANC and equalization; relevant to tonal/periodic components and residual shaping."
+citation_count: 
+keywords:
+  - "periodic ANC"
+  - "equalization"
+  - "tonal noise"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132792Z"
+query: "large validation ANC comfort Bark loudness sound quality"

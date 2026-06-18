@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Recent real-time shaping ANC for kitchen hood noise using psychoacoustic measures; reinforces pleasant residual sound target.

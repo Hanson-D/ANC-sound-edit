@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Equal-loudness contour foundation; motivates frequency-dependent ANC weighting.

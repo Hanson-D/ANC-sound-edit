@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Frequency-domain periodic ANC and equalization; relevant to tonal/periodic components and residual shaping.

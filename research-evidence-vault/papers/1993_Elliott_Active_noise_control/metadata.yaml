@@ -1,0 +1,20 @@
+title: "Active noise control"
+authors:
+  - "Stephen J. Elliott"
+  - "Philip A. Nelson"
+year: 1993
+venue: "IEEE Signal Processing Magazine"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/248551"
+source: "large_validation_seed"
+abstract: "Review of active noise control principles and implementation limits; useful baseline for separating physical cancellation limits from perceptual target shaping."
+citation_count: 
+keywords:
+  - "ANC"
+  - "review"
+  - "implementation"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132516Z"
+query: "large validation ANC comfort Bark loudness sound quality"

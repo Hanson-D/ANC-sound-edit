@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Analyzes ANC perceptual error shaping using RMS, binaural loudness, sharpness, PEMO-Q, and MBSTOI under head movement scenarios.

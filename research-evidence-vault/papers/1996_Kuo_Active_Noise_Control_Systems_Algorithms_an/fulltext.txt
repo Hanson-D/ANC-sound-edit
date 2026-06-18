@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Core ANC algorithms and DSP implementation reference; supports algorithmic rather than physical PNC changes.

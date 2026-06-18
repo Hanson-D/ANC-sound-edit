@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Integrates psychoacoustic ANC and masking; relevant to residual sound comfort in noise-canceling headphones.

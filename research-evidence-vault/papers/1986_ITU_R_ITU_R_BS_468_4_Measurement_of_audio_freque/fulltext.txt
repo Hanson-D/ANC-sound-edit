@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Noise weighting used in psychoacoustic ANC literature to prioritize perceptually sensitive frequency regions.

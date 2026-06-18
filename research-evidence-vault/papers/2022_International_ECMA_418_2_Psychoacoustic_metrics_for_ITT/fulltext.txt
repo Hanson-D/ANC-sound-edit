@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Defines psychoacoustic metrics such as loudness, sharpness, roughness and tonality for sound quality evaluation.

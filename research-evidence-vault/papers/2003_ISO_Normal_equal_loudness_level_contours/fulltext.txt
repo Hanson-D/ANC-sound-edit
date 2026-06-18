@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Equal-loudness contour standard; relevant to Bark-specific weighting and high sensitivity regions.

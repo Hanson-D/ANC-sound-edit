@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Automotive sound quality literature commonly uses loudness, sharpness, roughness, fluctuation strength and tonality.

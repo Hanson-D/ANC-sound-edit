@@ -1,0 +1,21 @@
+title: "Development of adaptive algorithm for active sound quality control"
+authors:
+  - "Sen M. Kuo"
+  - "A. Gupta"
+  - "S. Mallu"
+year: 2007
+venue: "Journal of Sound and Vibration"
+doi: ""
+url: "https://www.sciencedirect.com/science/article/pii/S0022460X06005963"
+source: "large_validation_seed"
+abstract: "Active sound quality control algorithm; supports optimizing perceived quality rather than SPL alone."
+citation_count: 
+keywords:
+  - "active sound quality control"
+  - "ANC"
+  - "sound quality"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132925Z"
+query: "large validation ANC comfort Bark loudness sound quality"

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Adaptive noise equalizer reference; supports designing residual spectrum rather than only maximizing attenuation.

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Sharpness foundation; relevant to high-Bark over-amplification guardrails.

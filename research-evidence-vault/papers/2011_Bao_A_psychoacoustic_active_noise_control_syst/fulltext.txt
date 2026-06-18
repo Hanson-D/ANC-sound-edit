@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Subband implementation of psychoacoustic weighting to reduce computational cost while emphasizing sensitive bands.

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Foundational spatial ANC and room control; useful for limitations of cancellation zones.

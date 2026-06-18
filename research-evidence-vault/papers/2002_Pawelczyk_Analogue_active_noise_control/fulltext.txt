@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Feedback/analog ANC reference cited by headphone hybrid ANC; useful for low-frequency feedback constraints.

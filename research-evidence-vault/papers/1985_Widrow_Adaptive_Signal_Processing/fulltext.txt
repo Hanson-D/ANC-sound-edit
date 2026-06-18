@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Classical LMS/adaptive filtering foundation for ANC algorithms.

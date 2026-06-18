@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Adaptive noise equalizer for broadband residual sound shaping; related to user-preferred residual spectra.

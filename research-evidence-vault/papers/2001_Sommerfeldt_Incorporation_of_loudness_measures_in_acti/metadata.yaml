@@ -1,0 +1,20 @@
+title: "Incorporation of loudness measures in active noise control"
+authors:
+  - "Scott D. Sommerfeldt"
+  - "Todd O. Samuels"
+year: 2001
+venue: "Journal of the Acoustical Society of America"
+doi: ""
+url: "https://asa.scitation.org/doi/abs/10.1121/1.1340641"
+source: "large_validation_seed"
+abstract: "Uses loudness measures within ANC evaluation/control rather than relying only on squared pressure."
+citation_count: 
+keywords:
+  - "ANC"
+  - "loudness"
+  - "psychoacoustics"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132653Z"
+query: "large validation ANC comfort Bark loudness sound quality"

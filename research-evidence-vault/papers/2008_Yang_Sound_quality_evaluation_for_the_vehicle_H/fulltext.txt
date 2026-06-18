@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+HVAC ANC sound-quality evaluation; relevant to comfort under fan/air-conditioning noise.

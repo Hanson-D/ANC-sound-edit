@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Uses spatial derivative constraints to enlarge quiet zone; relevant to comfort robustness near ears.

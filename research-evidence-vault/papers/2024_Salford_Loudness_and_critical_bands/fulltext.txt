@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Explains that equal-loudness contours show low-frequency tones need more sound power to be as loud as 1 kHz, and complex sound loudness requires critical bandwidths because tones within less than one critical bandwidth partly mask each other. Proper critical-band loudness is more perceptually meaningful than dB(A) alone.

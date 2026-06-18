@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Shows ANC changes sound quality dimensions for low-frequency and engine noise, so loudness reduction alone is insufficient.

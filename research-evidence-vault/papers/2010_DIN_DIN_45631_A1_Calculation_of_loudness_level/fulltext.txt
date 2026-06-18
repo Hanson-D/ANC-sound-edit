@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Standardized Zwicker loudness method including time-varying loudness; relevant to envelope comfort.

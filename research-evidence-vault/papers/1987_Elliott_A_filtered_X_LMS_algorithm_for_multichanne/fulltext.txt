@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Classic filtered-X LMS paper, foundation for adaptive ANC controllers.

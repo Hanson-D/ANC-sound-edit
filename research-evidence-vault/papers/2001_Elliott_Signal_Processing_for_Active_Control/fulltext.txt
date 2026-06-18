@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Foundational signal-processing reference for active noise/vibration control and robustness.

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Algorithmic ANC basis for later perceptual weighting and error shaping.

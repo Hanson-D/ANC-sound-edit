@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Active noise equalization algorithm that explicitly relates to loudness and sound-quality control.

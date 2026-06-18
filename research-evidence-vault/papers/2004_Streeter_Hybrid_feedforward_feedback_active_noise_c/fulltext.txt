@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Hybrid feedforward-feedback ANC basis for extending low-frequency attenuation.

@@ -1,0 +1,22 @@
+title: "Recent advances on active noise control: open issues and innovative applications"
+authors:
+  - "Dongyuan Shi"
+  - "Woon-Seng Gan"
+  - "B. Lam"
+year: 2012
+venue: "APSIPA Transactions on Signal and Information Processing"
+doi: "10.1017/atsip.2012.4"
+url: "https://www.cambridge.org/core/journals/apsipa-transactions-on-signal-and-information-processing/article/recent-advances-on-active-noise-control-open-issues-and-innovative-applications/9E27156562A24026ECD6F6A49A54F53A"
+source: "large_validation_seed"
+abstract: "Review article summarizing ANC algorithms, applications, constraints, and open issues; reinforces that passive methods are less effective at low frequencies and ANC is practical mainly there."
+citation_count: 
+keywords:
+  - "ANC"
+  - "review"
+  - "applications"
+  - "low frequency"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132552Z"
+query: "large validation ANC comfort Bark loudness sound quality"

@@ -1,0 +1,18 @@
+title: "ITU-R BS.468-4 Measurement of audio-frequency noise voltage level in sound broadcasting"
+authors:
+  - "ITU-R"
+year: 1986
+venue: "ITU-R recommendation"
+doi: ""
+url: "https://www.itu.int/rec/R-REC-BS.468/en"
+source: "large_validation_seed"
+abstract: "Noise weighting used in psychoacoustic ANC literature to prioritize perceptually sensitive frequency regions."
+citation_count: 
+keywords:
+  - "ITU-R 468"
+  - "noise weighting"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.134253Z"
+query: "large validation ANC comfort Bark loudness sound quality"

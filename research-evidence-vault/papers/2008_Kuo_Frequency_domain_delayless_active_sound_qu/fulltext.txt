@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Delayless frequency-domain ASQC; relevant to real-time headphone implementation constraints.

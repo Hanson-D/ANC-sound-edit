@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Psychoacoustic ANC aims to reduce perceived loudness and annoyance by prioritizing frequencies where human hearing is more sensitive. A hybrid headphone structure combines psychoacoustic feedforward control with feedback low-frequency attenuation; measurements on a prototype show passive attenuation dominates pleasantness but ANC further reduces loudness and roughness.

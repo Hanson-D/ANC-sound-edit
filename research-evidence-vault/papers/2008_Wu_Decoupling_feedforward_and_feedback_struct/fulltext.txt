@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Hybrid ANC decoupling reference; relevant to combining low-frequency feedback with perceptual feedforward paths.

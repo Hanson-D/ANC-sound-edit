@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Multichannel ANC for local spectral reshaping; relevant to Bark-band and tonal residual control.

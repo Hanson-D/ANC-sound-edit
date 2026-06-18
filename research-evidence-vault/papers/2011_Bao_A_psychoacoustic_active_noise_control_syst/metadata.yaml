@@ -1,0 +1,20 @@
+title: "A psychoacoustic active noise control system based on delayless subband adaptive filtering"
+authors:
+  - "Hua Bao"
+  - "Issa M. S. Panahi"
+year: 2011
+venue: "Conference paper"
+doi: ""
+url: ""
+source: "large_validation_seed"
+abstract: "Subband implementation of psychoacoustic weighting to reduce computational cost while emphasizing sensitive bands."
+citation_count: 
+keywords:
+  - "subband ANC"
+  - "psychoacoustic weighting"
+  - "delayless"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.133194Z"
+query: "large validation ANC comfort Bark loudness sound quality"

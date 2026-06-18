@@ -1,0 +1,19 @@
+title: "A dual sampling-rate active noise equalization algorithm for active control of noise"
+authors:
+  - "unknown"
+year: 2023
+venue: "Proceedings of Meetings on Acoustics"
+doi: ""
+url: "https://pubs.aip.org/asa/poma/article/50/1/030001/2870774/A-dual-sampling-rate-active-noise-equalization"
+source: "large_validation_seed"
+abstract: "Active noise equalization algorithm that explicitly relates to loudness and sound-quality control."
+citation_count: 
+keywords:
+  - "active noise equalization"
+  - "loudness"
+  - "algorithm"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.133298Z"
+query: "large validation ANC comfort Bark loudness sound quality"

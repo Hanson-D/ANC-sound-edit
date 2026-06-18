@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Active noise equalizer reference cited in active sound-quality-control reviews; relevant to controlled residual spectrum.

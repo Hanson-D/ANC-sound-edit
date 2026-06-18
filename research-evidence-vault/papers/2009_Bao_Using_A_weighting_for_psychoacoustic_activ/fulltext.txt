@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Incorporates A-weighting into adaptive active noise cancellation from a psychoacoustic point of view so residual noise control better reflects human hearing sensitivity than unweighted energy minimization.

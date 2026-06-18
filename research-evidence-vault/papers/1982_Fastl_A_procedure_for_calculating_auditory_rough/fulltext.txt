@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Roughness metric foundation; relevant to modulation/envelope discomfort in residual noise.

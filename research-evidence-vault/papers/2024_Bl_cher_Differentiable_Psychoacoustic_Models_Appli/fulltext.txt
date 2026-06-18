@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Proposes differentiable psychoacoustic models in ANC optimization to shape residual noise for pleasantness.

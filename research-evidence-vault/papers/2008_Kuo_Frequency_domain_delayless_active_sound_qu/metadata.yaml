@@ -1,0 +1,21 @@
+title: "Frequency-domain delayless active sound quality control algorithm"
+authors:
+  - "Sen M. Kuo"
+  - "R. K. Yenduri"
+  - "A. Gupta"
+year: 2008
+venue: "Journal of Sound and Vibration"
+doi: ""
+url: "https://www.sciencedirect.com/science/article/pii/S0022460X08003938"
+source: "large_validation_seed"
+abstract: "Delayless frequency-domain ASQC; relevant to real-time headphone implementation constraints."
+citation_count: 
+keywords:
+  - "active sound quality control"
+  - "frequency-domain"
+  - "real time"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132957Z"
+query: "large validation ANC comfort Bark loudness sound quality"

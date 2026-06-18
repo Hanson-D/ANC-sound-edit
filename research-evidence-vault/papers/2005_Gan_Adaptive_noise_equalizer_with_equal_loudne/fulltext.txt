@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Uses equal-loudness compensation in an adaptive noise equalizer, directly related to perceptual weighting.

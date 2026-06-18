@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Active sound quality control algorithm; supports optimizing perceived quality rather than SPL alone.

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Foundational ANC review; establishes ANC effectiveness mainly at low frequencies and practical constraints important when PNC geometry cannot be changed.

@@ -1,0 +1,1260 @@
+[
+  {
+    "title": "Using A-weighting for psychoacoustic active noise control",
+    "authors": [
+      "Hua Bao",
+      "Issa M. S. Panahi"
+    ],
+    "year": 2009,
+    "venue": "Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    "doi": "10.1109/IEMBS.2009.5332654",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19963645/",
+    "abstract": "Incorporates A-weighting into adaptive active noise cancellation from a psychoacoustic point of view so residual noise control better reflects human hearing sensitivity than unweighted energy minimization.",
+    "citation_count": null,
+    "source": "manual_seed_pubmed_web",
+    "keywords": [
+      "ANC",
+      "psychoacoustics",
+      "A-weighting",
+      "loudness",
+      "comfort"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Psychoacoustic Active Noise Control with ITU-R 468 Noise Weighting and its Sound Quality Analysis",
+    "authors": [
+      "Hua Bao",
+      "Issa M. S. Panahi"
+    ],
+    "year": 2010,
+    "venue": "Annual International Conference of the IEEE Engineering in Medicine and Biology Society",
+    "doi": "10.1109/IEMBS.2010.5626197",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/21095758/",
+    "abstract": "Applies ITU-R 468 noise weighting to psychoacoustic ANC and evaluates residual noise sound quality using a comfort model with loudness, roughness, sharpness, and tonality; related summaries report that reducing level alone does not necessarily reduce annoyance.",
+    "citation_count": null,
+    "source": "manual_seed_pubmed_web",
+    "keywords": [
+      "ANC",
+      "ITU-R 468",
+      "sound quality",
+      "loudness",
+      "sharpness",
+      "roughness",
+      "tonality"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A Perceptually Motivated Active Noise Control Design and Its Psychoacoustic Analysis",
+    "authors": [
+      "Hua Bao",
+      "Issa M. S. Panahi"
+    ],
+    "year": 2013,
+    "venue": "ETRI Journal",
+    "doi": "10.4218/etrij.13.0112.0822",
+    "url": "https://onlinelibrary.wiley.com/doi/abs/10.4218/etrij.13.0112.0822",
+    "abstract": "Traditional ANC minimizes residual noise energy without frequency discrimination, but human hearing has selective frequency sensitivity. The paper incorporates noise weighting into ANC and evaluates residual noise by a pleasantness model combining loudness, sharpness, roughness, and tonality; summaries report ITU-R 468 can outperform A-weighting.",
+    "citation_count": null,
+    "source": "manual_seed_crossref_web",
+    "keywords": [
+      "ANC",
+      "perceptual weighting",
+      "pleasantness",
+      "loudness",
+      "sharpness",
+      "roughness",
+      "tonality"
+    ],
+    "pdf_url": "https://koreascience.kr/article/JAKO201373959966137.pdf"
+  },
+  {
+    "title": "The Need for Psychoacoustics in Active Noise Cancellation",
+    "authors": [
+      "Sebastian Priese",
+      "Carsten Bruhnken",
+      "Daniel Voss",
+      "Eckhard Reithmeier"
+    ],
+    "year": 2013,
+    "venue": "AIA-DAGA 2013 International Conference on Acoustics",
+    "doi": "",
+    "url": "https://www.imr.uni-hannover.de/fileadmin/imr/Forschung/Publikationen_bak/000377.pdf",
+    "abstract": "Argues that high noise reduction alone is insufficient for ANC headphone comfort; test-person evaluation indicates perceived loudness is not the only factor and pleasantness is important. The paper highlights human sensitivity around 2 kHz to 5 kHz and the need to design ANC using psychoacoustic properties.",
+    "citation_count": null,
+    "source": "manual_seed_open_pdf",
+    "keywords": [
+      "ANC headphones",
+      "comfort",
+      "pleasantness",
+      "loudness",
+      "equal-loudness",
+      "2-5 kHz"
+    ],
+    "pdf_url": "https://www.imr.uni-hannover.de/fileadmin/imr/Forschung/Publikationen_bak/000377.pdf"
+  },
+  {
+    "title": "A Spectral Modulation Sensitivity Weighted Pre-emphasis Filter for Active Noise Control System",
+    "authors": [
+      "Kah-Meng Cheong",
+      "Yuh-Yuan Wang",
+      "Tai-Shih Chi"
+    ],
+    "year": 2016,
+    "venue": "Interspeech 2016",
+    "doi": "10.21437/Interspeech.2016-1315",
+    "url": "https://www.isca-archive.org/interspeech_2016/cheong16_interspeech.html",
+    "abstract": "Extends psychoacoustic ANC beyond frequency-dependent hearing thresholds by considering spectral modulation sensitivity. The proposed pre-emphasis filter shapes residual error and is evaluated by SPL and loudness level, outperforming compared systems in simulations under narrowband and broadband noise and validated on DSP hardware.",
+    "citation_count": null,
+    "source": "manual_seed_isca_web",
+    "keywords": [
+      "ANC",
+      "spectral modulation",
+      "Bark relationship",
+      "loudness",
+      "residual shaping"
+    ],
+    "pdf_url": "https://www.isca-archive.org/interspeech_2016/cheong16_interspeech.pdf"
+  },
+  {
+    "title": "Psychoacoustic Hybrid Active Noise Control Structure for Application in Headphones",
+    "authors": [
+      "Piero Rivera Benois",
+      "Veatriki Papantoni",
+      "Udo Zölzer"
+    ],
+    "year": 2018,
+    "venue": "25th International Congress on Sound and Vibration",
+    "doi": "",
+    "url": "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf",
+    "abstract": "Psychoacoustic ANC aims to reduce perceived loudness and annoyance by prioritizing frequencies where human hearing is more sensitive. A hybrid headphone structure combines psychoacoustic feedforward control with feedback low-frequency attenuation; measurements on a prototype show passive attenuation dominates pleasantness but ANC further reduces loudness and roughness.",
+    "citation_count": null,
+    "source": "manual_seed_open_pdf",
+    "keywords": [
+      "ANC headphones",
+      "hybrid control",
+      "psychoacoustics",
+      "loudness",
+      "roughness",
+      "sharpness"
+    ],
+    "pdf_url": "https://www.hsu-hh.de/ant/wp-content/uploads/sites/699/2018/08/ICSV25_full_paper_Rivera_Papantoni_Zoelzer.pdf"
+  },
+  {
+    "title": "Loudness and critical bands",
+    "authors": [
+      "Acoustics Innovation Institute, University of Salford"
+    ],
+    "year": 2024,
+    "venue": "University of Salford Psychoacoustics Knowledge Base",
+    "doi": "",
+    "url": "https://acoustics.salford.ac.uk/psychoacoustics/sound-quality-making-products-sound-better/an-introduction-to-sound-quality-testing/loudness/",
+    "abstract": "Explains that equal-loudness contours show low-frequency tones need more sound power to be as loud as 1 kHz, and complex sound loudness requires critical bandwidths because tones within less than one critical bandwidth partly mask each other. Proper critical-band loudness is more perceptually meaningful than dB(A) alone.",
+    "citation_count": null,
+    "source": "manual_seed_web_reference",
+    "keywords": [
+      "Bark",
+      "critical bands",
+      "loudness summation",
+      "masking",
+      "equal-loudness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Active Noise Control: A Tutorial Review",
+    "authors": [
+      "Sen M. Kuo",
+      "Dennis R. Morgan"
+    ],
+    "year": 1999,
+    "venue": "Proceedings of the IEEE",
+    "doi": "10.1109/5.763310",
+    "url": "https://ieeexplore.ieee.org/document/763310",
+    "abstract": "Foundational ANC review; establishes ANC effectiveness mainly at low frequencies and practical constraints important when PNC geometry cannot be changed.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "review",
+      "low frequency",
+      "constraints"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Active noise control",
+    "authors": [
+      "Stephen J. Elliott",
+      "Philip A. Nelson"
+    ],
+    "year": 1993,
+    "venue": "IEEE Signal Processing Magazine",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/248551",
+    "abstract": "Review of active noise control principles and implementation limits; useful baseline for separating physical cancellation limits from perceptual target shaping.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "review",
+      "implementation"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Recent advances on active noise control: open issues and innovative applications",
+    "authors": [
+      "Dongyuan Shi",
+      "Woon-Seng Gan",
+      "B. Lam"
+    ],
+    "year": 2012,
+    "venue": "APSIPA Transactions on Signal and Information Processing",
+    "doi": "10.1017/atsip.2012.4",
+    "url": "https://www.cambridge.org/core/journals/apsipa-transactions-on-signal-and-information-processing/article/recent-advances-on-active-noise-control-open-issues-and-innovative-applications/9E27156562A24026ECD6F6A49A54F53A",
+    "abstract": "Review article summarizing ANC algorithms, applications, constraints, and open issues; reinforces that passive methods are less effective at low frequencies and ANC is practical mainly there.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "review",
+      "applications",
+      "low frequency"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Active Noise Control Systems: Algorithms and DSP Implementations",
+    "authors": [
+      "Sen M. Kuo",
+      "Dennis R. Morgan"
+    ],
+    "year": 1996,
+    "venue": "Wiley book",
+    "doi": "",
+    "url": "https://www.wiley.com/en-us/Active+Noise+Control+Systems%3A+Algorithms+and+DSP+Implementations-p-9780471134244",
+    "abstract": "Core ANC algorithms and DSP implementation reference; supports algorithmic rather than physical PNC changes.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "DSP",
+      "FxLMS"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Psychoacoustics: Facts and Models",
+    "authors": [
+      "Eberhard Zwicker",
+      "Hugo Fastl"
+    ],
+    "year": 2007,
+    "venue": "Springer book",
+    "doi": "",
+    "url": "https://link.springer.com/book/10.1007/978-3-540-68888-4",
+    "abstract": "Foundational psychoacoustics reference for Bark scale, critical bands, masking, loudness, sharpness, and roughness.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "Bark",
+      "critical bands",
+      "loudness",
+      "sharpness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Incorporation of loudness measures in active noise control",
+    "authors": [
+      "Scott D. Sommerfeldt",
+      "Todd O. Samuels"
+    ],
+    "year": 2001,
+    "venue": "Journal of the Acoustical Society of America",
+    "doi": "",
+    "url": "https://asa.scitation.org/doi/abs/10.1121/1.1340641",
+    "abstract": "Uses loudness measures within ANC evaluation/control rather than relying only on squared pressure.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "loudness",
+      "psychoacoustics"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Residual Noise Shaping Technique for Active Noise Control Systems",
+    "authors": [
+      "Sen M. Kuo",
+      "Jyh-Ching Tsai"
+    ],
+    "year": 1994,
+    "venue": "Journal of the Acoustical Society of America",
+    "doi": "",
+    "url": "https://pubs.aip.org/asa/jasa/article/95/3/1665/559556/Residual-noise-shaping-technique-for-active-noise",
+    "abstract": "Early residual-noise shaping paper; relevant to comfort curves because it changes residual spectrum rather than only minimizing total energy.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "residual shaping",
+      "spectral shaping"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Development and experiment of narrowband active noise equalizer",
+    "authors": [
+      "Sen M. Kuo",
+      "M. J. Ji",
+      "X. H. Jiang"
+    ],
+    "year": 1993,
+    "venue": "Noise Control Engineering Journal",
+    "doi": "",
+    "url": "",
+    "abstract": "Active noise equalizer reference cited in active sound-quality-control reviews; relevant to controlled residual spectrum.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active noise equalizer",
+      "spectral shaping"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Broadband Adaptive Noise Equalizer",
+    "authors": [
+      "Sen M. Kuo",
+      "Y. Yang"
+    ],
+    "year": 1996,
+    "venue": "IEEE Signal Processing Letters",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/535352",
+    "abstract": "Adaptive noise equalizer for broadband residual sound shaping; related to user-preferred residual spectra.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active noise equalizer",
+      "broadband",
+      "spectral shaping"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Development and analysis of an adaptive noise equalizer",
+    "authors": [
+      "Sen M. Kuo",
+      "M. J. Ji"
+    ],
+    "year": 1995,
+    "venue": "IEEE Transactions on Speech and Audio Processing",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/387004",
+    "abstract": "Adaptive noise equalizer reference; supports designing residual spectrum rather than only maximizing attenuation.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "adaptive noise equalizer",
+      "spectral shaping"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Frequency-Domain Periodic Active Noise Control and Equalization",
+    "authors": [
+      "Sen M. Kuo",
+      "M. Tahernezhadi",
+      "Li Ji"
+    ],
+    "year": 1997,
+    "venue": "IEEE Transactions on Speech and Audio Processing",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/595748",
+    "abstract": "Frequency-domain periodic ANC and equalization; relevant to tonal/periodic components and residual shaping.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "periodic ANC",
+      "equalization",
+      "tonal noise"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Adaptive noise equalizer with equal-loudness compensation",
+    "authors": [
+      "Woon-Seng Gan",
+      "Sen M. Kuo",
+      "J. W. Feng"
+    ],
+    "year": 2005,
+    "venue": "IEEE International Symposium on Circuits and Systems",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/1464605",
+    "abstract": "Uses equal-loudness compensation in an adaptive noise equalizer, directly related to perceptual weighting.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "equal loudness",
+      "noise equalizer",
+      "ANC"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Multichannel active noise control system for local spectral reshaping of multifrequency noise",
+    "authors": [
+      "M. de Diego",
+      "A. Gonzalez",
+      "M. Ferrer",
+      "G. Piñero"
+    ],
+    "year": 2004,
+    "venue": "Journal of Sound and Vibration",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0022460X03005896",
+    "abstract": "Multichannel ANC for local spectral reshaping; relevant to Bark-band and tonal residual control.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "multichannel ANC",
+      "spectral reshaping",
+      "multifrequency"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Development of adaptive algorithm for active sound quality control",
+    "authors": [
+      "Sen M. Kuo",
+      "A. Gupta",
+      "S. Mallu"
+    ],
+    "year": 2007,
+    "venue": "Journal of Sound and Vibration",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0022460X06005963",
+    "abstract": "Active sound quality control algorithm; supports optimizing perceived quality rather than SPL alone.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active sound quality control",
+      "ANC",
+      "sound quality"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Frequency-domain delayless active sound quality control algorithm",
+    "authors": [
+      "Sen M. Kuo",
+      "R. K. Yenduri",
+      "A. Gupta"
+    ],
+    "year": 2008,
+    "venue": "Journal of Sound and Vibration",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0022460X08003938",
+    "abstract": "Delayless frequency-domain ASQC; relevant to real-time headphone implementation constraints.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active sound quality control",
+      "frequency-domain",
+      "real time"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Sound quality of low-frequency and car engine noises after active noise control",
+    "authors": [
+      "A. Gonzalez",
+      "M. Ferrer",
+      "M. de Diego",
+      "G. Piñero"
+    ],
+    "year": 2003,
+    "venue": "Journal of Sound and Vibration",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0022460X03003005",
+    "abstract": "Shows ANC changes sound quality dimensions for low-frequency and engine noise, so loudness reduction alone is insufficient.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "sound quality",
+      "engine noise",
+      "roughness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Sound quality evaluation for the vehicle HVAC system after active noise control",
+    "authors": [
+      "I. H. Yang",
+      "O. C. Kwon",
+      "J. Y. Lee",
+      "J. E. Oh"
+    ],
+    "year": 2008,
+    "venue": "ASME International Mechanical Engineering Congress and Exposition",
+    "doi": "",
+    "url": "",
+    "abstract": "HVAC ANC sound-quality evaluation; relevant to comfort under fan/air-conditioning noise.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "HVAC",
+      "ANC",
+      "sound quality"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Review and future perspectives on Active Sound Quality Control",
+    "authors": [
+      "M. Ferrer",
+      "M. de Diego",
+      "A. Gonzalez"
+    ],
+    "year": 2010,
+    "venue": "ISMA 2010",
+    "doi": "",
+    "url": "https://past.isma-isaac.be/downloads/isma2010/papers/isma2010_0230.pdf",
+    "abstract": "Review argues mere noise reduction by ANC does not guarantee sound-quality improvement; cites loudness measures and active equalization.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active sound quality control",
+      "review",
+      "loudness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Review of active noise control techniques with emphasis on sound quality enhancement",
+    "authors": [
+      "X. Jiang",
+      "F. Li"
+    ],
+    "year": 2018,
+    "venue": "Applied Acoustics / review record",
+    "doi": "",
+    "url": "https://www.researchgate.net/publication/326099290_Review_of_active_noise_control_techniques_with_emphasis_on_sound_quality_enhancement",
+    "abstract": "Review focused on ANC development for sound-quality enhancement and residual spectrum requirements.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "sound quality",
+      "review"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Integrated psychoacoustic active noise control and masking",
+    "authors": [
+      "Valiantsin Belyi",
+      "Woon-Seng Gan"
+    ],
+    "year": 2019,
+    "venue": "Applied Acoustics",
+    "doi": "10.1016/j.apacoust.2018.10.027",
+    "url": "https://dr.ntu.edu.sg/entities/publication/dba290c7-6cfc-4f32-9508-95d5e2736833",
+    "abstract": "Integrates psychoacoustic ANC and masking; relevant to residual sound comfort in noise-canceling headphones.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "psychoacoustic ANC",
+      "masking",
+      "headphones"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A psychoacoustic active noise control system based on delayless subband adaptive filtering",
+    "authors": [
+      "Hua Bao",
+      "Issa M. S. Panahi"
+    ],
+    "year": 2011,
+    "venue": "Conference paper",
+    "doi": "",
+    "url": "",
+    "abstract": "Subband implementation of psychoacoustic weighting to reduce computational cost while emphasizing sensitive bands.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "subband ANC",
+      "psychoacoustic weighting",
+      "delayless"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Psychoacoustic study on active control system for kitchen hoods noise",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2025,
+    "venue": "Journal of Low Frequency Noise, Vibration and Active Control",
+    "doi": "10.1177/14613484251403243",
+    "url": "https://journals.sagepub.com/doi/10.1177/14613484251403243",
+    "abstract": "Recent real-time shaping ANC for kitchen hood noise using psychoacoustic measures; reinforces pleasant residual sound target.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "psychoacoustics",
+      "kitchen hood",
+      "pleasantness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Differentiable Psychoacoustic Models Applied in Active Noise Control",
+    "authors": [
+      "Michael Blöcher"
+    ],
+    "year": 2024,
+    "venue": "PhD expose",
+    "doi": "",
+    "url": "https://phd.kug.ac.at/fileadmin/03_Microsites/01_Kuenstlerisch_wissenschaftliche_Einheiten/02_Doktorratsschulen/Doktoratsschule_fuer_das_wissenschaftliche_Studium/04_Laufende_Dissertationen/Bloecher_Expose_Abstract.pdf",
+    "abstract": "Proposes differentiable psychoacoustic models in ANC optimization to shape residual noise for pleasantness.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "differentiable psychoacoustics",
+      "ANC",
+      "pleasantness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Spatial Psychoacoustic Analysis of Perceptual Error Shaping in Active Noise Control",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2025,
+    "venue": "Forum Acusticum / Euracoustics",
+    "doi": "",
+    "url": "https://dael.euracoustics.org/confs/fa2025/data/articles/000812.pdf",
+    "abstract": "Analyzes ANC perceptual error shaping using RMS, binaural loudness, sharpness, PEMO-Q, and MBSTOI under head movement scenarios.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "spatial ANC",
+      "perceptual error shaping",
+      "sharpness",
+      "binaural loudness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A dual sampling-rate active noise equalization algorithm for active control of noise",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2023,
+    "venue": "Proceedings of Meetings on Acoustics",
+    "doi": "",
+    "url": "https://pubs.aip.org/asa/poma/article/50/1/030001/2870774/A-dual-sampling-rate-active-noise-equalization",
+    "abstract": "Active noise equalization algorithm that explicitly relates to loudness and sound-quality control.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active noise equalization",
+      "loudness",
+      "algorithm"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A review of research on active noise control near human ear in complex sound field",
+    "authors": [
+      "H. S. Zou",
+      "X. J. Qiu"
+    ],
+    "year": 2019,
+    "venue": "Acta Physica Sinica",
+    "doi": "",
+    "url": "",
+    "abstract": "Review focused on ANC near the human ear; directly relevant to headphones where PNC cannot be changed.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "near-ear ANC",
+      "headphones",
+      "review"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Performance of personal active noise reduction devices",
+    "authors": [
+      "B. Rudzyn",
+      "M. Fisher"
+    ],
+    "year": 2012,
+    "venue": "Applied Acoustics",
+    "doi": "",
+    "url": "",
+    "abstract": "Personal active noise reduction device performance; relevant to headphone comfort and limitations.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "personal ANC",
+      "headphones",
+      "performance"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Analogue active noise control",
+    "authors": [
+      "Marek Pawelczyk"
+    ],
+    "year": 2002,
+    "venue": "Applied Acoustics",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0003682X02000139",
+    "abstract": "Feedback/analog ANC reference cited by headphone hybrid ANC; useful for low-frequency feedback constraints.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "feedback ANC",
+      "low frequency",
+      "analog"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Hybrid feedforward-feedback active noise control",
+    "authors": [
+      "A. D. Streeter",
+      "L. R. Ray",
+      "R. D. Collier"
+    ],
+    "year": 2004,
+    "venue": "American Control Conference",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/1383862",
+    "abstract": "Hybrid feedforward-feedback ANC basis for extending low-frequency attenuation.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "hybrid ANC",
+      "feedforward",
+      "feedback"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Decoupling feedforward and feedback structures in hybrid active noise control systems",
+    "authors": [
+      "L. Wu",
+      "X. Qiu",
+      "I. S. Burnett",
+      "Y. Guo"
+    ],
+    "year": 2008,
+    "venue": "Journal / conference record",
+    "doi": "",
+    "url": "",
+    "abstract": "Hybrid ANC decoupling reference; relevant to combining low-frequency feedback with perceptual feedforward paths.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "hybrid ANC",
+      "decoupling"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Spatial active noise control based on kernel interpolation of sound field",
+    "authors": [
+      "Shoichi Koyama",
+      "Jesper Brunnström",
+      "Hayato Ito",
+      "Natsuki Ueno",
+      "Hiroshi Saruwatari"
+    ],
+    "year": 2021,
+    "venue": "IEEE/ACM Transactions on Audio, Speech, and Language Processing",
+    "doi": "10.1109/TASLP.2021.3107983",
+    "url": "https://github.com/sh01k/KernelInterpSpatialANC",
+    "abstract": "Spatial ANC method relevant to zone-of-comfort robustness and head position variation.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "spatial ANC",
+      "zone of quiet",
+      "kernel interpolation"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Multichannel Active Noise Control With Spatial Derivative Constraints to Enlarge the Quiet Zone",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2024,
+    "venue": "Conference paper",
+    "doi": "",
+    "url": "",
+    "abstract": "Uses spatial derivative constraints to enlarge quiet zone; relevant to comfort robustness near ears.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "spatial ANC",
+      "quiet zone",
+      "constraints"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Objective Signal Analysis for Investigating Feasibility of Active Noise Control in MRI",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2022,
+    "venue": "Sensors / PMC article",
+    "doi": "",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9572409/",
+    "abstract": "Applies objective signal analysis to ANC feasibility; relevant to evaluating tonal/broadband noise constraints.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "objective analysis",
+      "medical noise"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Active noise control of sound fields in rooms",
+    "authors": [
+      "P. A. Nelson",
+      "S. J. Elliott"
+    ],
+    "year": 1992,
+    "venue": "Book / monograph",
+    "doi": "",
+    "url": "",
+    "abstract": "Foundational spatial ANC and room control; useful for limitations of cancellation zones.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "spatial ANC",
+      "rooms",
+      "foundations"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Signal Processing for Active Control",
+    "authors": [
+      "Stephen J. Elliott"
+    ],
+    "year": 2001,
+    "venue": "Academic Press book",
+    "doi": "",
+    "url": "https://www.sciencedirect.com/book/9780122370854/signal-processing-for-active-control",
+    "abstract": "Foundational signal-processing reference for active noise/vibration control and robustness.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ANC",
+      "signal processing",
+      "robustness"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Active control of sound",
+    "authors": [
+      "P. A. Nelson",
+      "S. J. Elliott"
+    ],
+    "year": 1992,
+    "venue": "Academic Press book",
+    "doi": "",
+    "url": "",
+    "abstract": "Foundational active sound control reference; helpful for physical feasibility boundaries.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "active control",
+      "foundations"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Filtered-x LMS and filtered-u recursive LMS algorithms for active noise control",
+    "authors": [
+      "unknown"
+    ],
+    "year": 1990,
+    "venue": "Signal Processing / ANC methods",
+    "doi": "",
+    "url": "",
+    "abstract": "Algorithmic ANC basis for later perceptual weighting and error shaping.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "FxLMS",
+      "ANC",
+      "adaptive filtering"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A filtered-X LMS algorithm for multichannel active sound control",
+    "authors": [
+      "Stephen J. Elliott",
+      "I. M. Stothers",
+      "P. A. Nelson"
+    ],
+    "year": 1987,
+    "venue": "IEEE Transactions on Acoustics, Speech, and Signal Processing",
+    "doi": "",
+    "url": "https://ieeexplore.ieee.org/document/1165104",
+    "abstract": "Classic filtered-X LMS paper, foundation for adaptive ANC controllers.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "FxLMS",
+      "adaptive ANC"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Fundamentals of Adaptive Filtering",
+    "authors": [
+      "Ali H. Sayed"
+    ],
+    "year": 2003,
+    "venue": "Wiley book",
+    "doi": "",
+    "url": "https://onlinelibrary.wiley.com/doi/book/10.1002/0471461261",
+    "abstract": "Adaptive filtering foundation cited by headphone ANC work.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "adaptive filtering",
+      "ANC foundation"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Adaptive Signal Processing",
+    "authors": [
+      "Bernard Widrow",
+      "Samuel D. Stearns"
+    ],
+    "year": 1985,
+    "venue": "Prentice-Hall book",
+    "doi": "",
+    "url": "",
+    "abstract": "Classical LMS/adaptive filtering foundation for ANC algorithms.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "adaptive filtering",
+      "LMS"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Methods for calculating loudness",
+    "authors": [
+      "ISO"
+    ],
+    "year": 2017,
+    "venue": "ISO 532-1 / ISO 532-2",
+    "doi": "",
+    "url": "https://www.iso.org/standard/63077.html",
+    "abstract": "Standard loudness calculation reference; relevant for objective residual loudness measurement.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "loudness standard",
+      "ISO 532",
+      "Zwicker"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "DIN 45631/A1: Calculation of loudness level and loudness from the sound spectrum",
+    "authors": [
+      "DIN"
+    ],
+    "year": 2010,
+    "venue": "DIN standard",
+    "doi": "",
+    "url": "",
+    "abstract": "Standardized Zwicker loudness method including time-varying loudness; relevant to envelope comfort.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "loudness",
+      "time-varying",
+      "standard"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "ECMA-418-2 Psychoacoustic metrics for ITT equipment",
+    "authors": [
+      "ECMA International"
+    ],
+    "year": 2022,
+    "venue": "ECMA standard",
+    "doi": "",
+    "url": "https://ecma-international.org/publications-and-standards/standards/ecma-418/",
+    "abstract": "Defines psychoacoustic metrics such as loudness, sharpness, roughness and tonality for sound quality evaluation.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "psychoacoustic metrics",
+      "sharpness",
+      "roughness",
+      "tonality"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A procedure for calculating auditory roughness",
+    "authors": [
+      "Hugo Fastl"
+    ],
+    "year": 1982,
+    "venue": "Acustica",
+    "doi": "",
+    "url": "",
+    "abstract": "Roughness metric foundation; relevant to modulation/envelope discomfort in residual noise.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "roughness",
+      "modulation",
+      "psychoacoustics"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Berechnungsverfahren für den sensorischen Wohlklang beliebiger Schallsignale",
+    "authors": [
+      "W. Aures"
+    ],
+    "year": 1985,
+    "venue": "Acustica",
+    "doi": "",
+    "url": "",
+    "abstract": "Aures sensory pleasantness model combines psychoacoustic factors; cited by psychoacoustic ANC headphone work.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "pleasantness",
+      "Aures",
+      "sound quality"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Procedure for calculating loudness of temporally variable sounds",
+    "authors": [
+      "Hugo Fastl",
+      "Eberhard Zwicker"
+    ],
+    "year": 2007,
+    "venue": "Psychoacoustics model",
+    "doi": "",
+    "url": "",
+    "abstract": "Time-varying loudness concepts underpin envelope constraints for comfortable ANC.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "time-varying loudness",
+      "envelope"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A model of loudness applicable to time-varying sounds",
+    "authors": [
+      "Brian C. J. Moore",
+      "Brian R. Glasberg",
+      "Thomas Baer"
+    ],
+    "year": 1997,
+    "venue": "Journal of the Audio Engineering Society",
+    "doi": "",
+    "url": "",
+    "abstract": "Loudness model for time-varying sounds; relevant to attack/release and pumping comfort.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "loudness model",
+      "time-varying",
+      "envelope"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "A model of loudness applicable to time-varying sounds",
+    "authors": [
+      "Brian R. Glasberg",
+      "Brian C. J. Moore"
+    ],
+    "year": 2002,
+    "venue": "Journal of the Audio Engineering Society",
+    "doi": "",
+    "url": "",
+    "abstract": "Updated loudness model for time-varying sounds; useful objective metric for ANC residual envelopes.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "loudness model",
+      "time-varying"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Modeling the loudness of sounds as perceived by normal-hearing and hearing-impaired listeners",
+    "authors": [
+      "Brian C. J. Moore",
+      "Brian R. Glasberg"
+    ],
+    "year": 2004,
+    "venue": "Journal of the Acoustical Society of America",
+    "doi": "",
+    "url": "",
+    "abstract": "Loudness modeling reference; supports using auditory rather than SPL weighting.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "loudness model",
+      "hearing"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Sharpness as an attribute of the timbre of steady sounds",
+    "authors": [
+      "Hugo Fastl",
+      "Eberhard Zwicker"
+    ],
+    "year": 1980,
+    "venue": "Psychoacoustics reference",
+    "doi": "",
+    "url": "",
+    "abstract": "Sharpness foundation; relevant to high-Bark over-amplification guardrails.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "sharpness",
+      "timbre",
+      "high frequency"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "An unbiased annoyance model for environmental noise",
+    "authors": [
+      "D. W. Robinson"
+    ],
+    "year": 1971,
+    "venue": "Journal / environmental noise",
+    "doi": "",
+    "url": "",
+    "abstract": "Annoyance modeling background; relevant to comfort beyond loudness.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "annoyance",
+      "environmental noise"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Sound quality metrics for automotive interior noise",
+    "authors": [
+      "unknown"
+    ],
+    "year": 2000,
+    "venue": "Automotive sound quality literature",
+    "doi": "",
+    "url": "",
+    "abstract": "Automotive sound quality literature commonly uses loudness, sharpness, roughness, fluctuation strength and tonality.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "automotive",
+      "sound quality",
+      "psychoacoustics"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Loudness: A measure of the response of the ear to sound",
+    "authors": [
+      "Harvey Fletcher",
+      "W. A. Munson"
+    ],
+    "year": 1933,
+    "venue": "Journal of the Acoustical Society of America",
+    "doi": "",
+    "url": "",
+    "abstract": "Equal-loudness contour foundation; motivates frequency-dependent ANC weighting.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "equal loudness",
+      "hearing sensitivity"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "Normal equal-loudness-level contours",
+    "authors": [
+      "ISO"
+    ],
+    "year": 2003,
+    "venue": "ISO 226",
+    "doi": "",
+    "url": "https://www.iso.org/standard/34222.html",
+    "abstract": "Equal-loudness contour standard; relevant to Bark-specific weighting and high sensitivity regions.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "equal loudness",
+      "ISO 226"
+    ],
+    "pdf_url": ""
+  },
+  {
+    "title": "ITU-R BS.468-4 Measurement of audio-frequency noise voltage level in sound broadcasting",
+    "authors": [
+      "ITU-R"
+    ],
+    "year": 1986,
+    "venue": "ITU-R recommendation",
+    "doi": "",
+    "url": "https://www.itu.int/rec/R-REC-BS.468/en",
+    "abstract": "Noise weighting used in psychoacoustic ANC literature to prioritize perceptually sensitive frequency regions.",
+    "citation_count": null,
+    "source": "large_validation_seed",
+    "keywords": [
+      "ITU-R 468",
+      "noise weighting"
+    ],
+    "pdf_url": ""
+  }
+]

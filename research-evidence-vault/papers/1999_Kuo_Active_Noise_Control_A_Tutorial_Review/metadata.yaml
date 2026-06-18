@@ -1,0 +1,21 @@
+title: "Active Noise Control: A Tutorial Review"
+authors:
+  - "Sen M. Kuo"
+  - "Dennis R. Morgan"
+year: 1999
+venue: "Proceedings of the IEEE"
+doi: "10.1109/5.763310"
+url: "https://ieeexplore.ieee.org/document/763310"
+source: "large_validation_seed"
+abstract: "Foundational ANC review; establishes ANC effectiveness mainly at low frequencies and practical constraints important when PNC geometry cannot be changed."
+citation_count: 
+keywords:
+  - "ANC"
+  - "review"
+  - "low frequency"
+  - "constraints"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132462Z"
+query: "large validation ANC comfort Bark loudness sound quality"

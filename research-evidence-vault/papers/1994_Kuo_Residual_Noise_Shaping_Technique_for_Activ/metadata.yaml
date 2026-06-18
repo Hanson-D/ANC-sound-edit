@@ -1,0 +1,20 @@
+title: "Residual Noise Shaping Technique for Active Noise Control Systems"
+authors:
+  - "Sen M. Kuo"
+  - "Jyh-Ching Tsai"
+year: 1994
+venue: "Journal of the Acoustical Society of America"
+doi: ""
+url: "https://pubs.aip.org/asa/jasa/article/95/3/1665/559556/Residual-noise-shaping-technique-for-active-noise"
+source: "large_validation_seed"
+abstract: "Early residual-noise shaping paper; relevant to comfort curves because it changes residual spectrum rather than only minimizing total energy."
+citation_count: 
+keywords:
+  - "ANC"
+  - "residual shaping"
+  - "spectral shaping"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132685Z"
+query: "large validation ANC comfort Bark loudness sound quality"

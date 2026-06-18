@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Loudness modeling reference; supports using auditory rather than SPL weighting.

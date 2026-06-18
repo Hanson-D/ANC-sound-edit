@@ -1,0 +1,21 @@
+# Local literature workflow configuration.
+# This file is intentionally simple YAML so it remains readable by humans and agents.
+vault_root: research-evidence-vault
+results_file: data/search_results.jsonl
+papers_dir: papers
+pdf_dir: pdfs
+user_agent: "ANCAdjust Literature Workflow (mailto:replace-with-your-email@example.com)"
+max_results: 20
+sources:
+  arxiv: true
+  pubmed: true
+  semantic_scholar: true
+  openalex: true
+  crossref: true
+  biorxiv_medrxiv: true
+pdf_policy:
+  open_access_only: true
+  do_not_bypass_paywalls: true
+summary_policy:
+  require_source_attribution: true
+  mark_abstract_only: true

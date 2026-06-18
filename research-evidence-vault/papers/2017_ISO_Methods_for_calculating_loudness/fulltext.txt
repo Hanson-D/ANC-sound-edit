@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Standard loudness calculation reference; relevant for objective residual loudness measurement.

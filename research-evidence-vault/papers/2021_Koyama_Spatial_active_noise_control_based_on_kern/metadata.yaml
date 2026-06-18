@@ -1,0 +1,23 @@
+title: "Spatial active noise control based on kernel interpolation of sound field"
+authors:
+  - "Shoichi Koyama"
+  - "Jesper Brunnström"
+  - "Hayato Ito"
+  - "Natsuki Ueno"
+  - "Hiroshi Saruwatari"
+year: 2021
+venue: "IEEE/ACM Transactions on Audio, Speech, and Language Processing"
+doi: "10.1109/TASLP.2021.3107983"
+url: "https://github.com/sh01k/KernelInterpSpatialANC"
+source: "large_validation_seed"
+abstract: "Spatial ANC method relevant to zone-of-comfort robustness and head position variation."
+citation_count: 
+keywords:
+  - "spatial ANC"
+  - "zone of quiet"
+  - "kernel interpolation"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.133519Z"
+query: "large validation ANC comfort Bark loudness sound quality"

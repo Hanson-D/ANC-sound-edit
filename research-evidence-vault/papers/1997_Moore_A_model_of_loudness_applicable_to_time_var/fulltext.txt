@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Loudness model for time-varying sounds; relevant to attack/release and pumping comfort.

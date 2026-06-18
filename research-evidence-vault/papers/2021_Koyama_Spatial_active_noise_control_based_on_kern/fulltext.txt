@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Spatial ANC method relevant to zone-of-comfort robustness and head position variation.

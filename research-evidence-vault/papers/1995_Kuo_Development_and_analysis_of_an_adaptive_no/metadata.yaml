@@ -1,0 +1,19 @@
+title: "Development and analysis of an adaptive noise equalizer"
+authors:
+  - "Sen M. Kuo"
+  - "M. J. Ji"
+year: 1995
+venue: "IEEE Transactions on Speech and Audio Processing"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/387004"
+source: "large_validation_seed"
+abstract: "Adaptive noise equalizer reference; supports designing residual spectrum rather than only maximizing attenuation."
+citation_count: 
+keywords:
+  - "adaptive noise equalizer"
+  - "spectral shaping"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132765Z"
+query: "large validation ANC comfort Bark loudness sound quality"

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Early residual-noise shaping paper; relevant to comfort curves because it changes residual spectrum rather than only minimizing total energy.

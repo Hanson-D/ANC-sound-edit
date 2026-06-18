@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Applies objective signal analysis to ANC feasibility; relevant to evaluating tonal/broadband noise constraints.

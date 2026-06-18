@@ -1,0 +1,20 @@
+title: "A filtered-X LMS algorithm for multichannel active sound control"
+authors:
+  - "Stephen J. Elliott"
+  - "I. M. Stothers"
+  - "P. A. Nelson"
+year: 1987
+venue: "IEEE Transactions on Acoustics, Speech, and Signal Processing"
+doi: ""
+url: "https://ieeexplore.ieee.org/document/1165104"
+source: "large_validation_seed"
+abstract: "Classic filtered-X LMS paper, foundation for adaptive ANC controllers."
+citation_count: 
+keywords:
+  - "FxLMS"
+  - "adaptive ANC"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.133769Z"
+query: "large validation ANC comfort Bark loudness sound quality"

@@ -1,0 +1,3 @@
+ABSTRACT ONLY
+
+Uses loudness measures within ANC evaluation/control rather than relying only on squared pressure.

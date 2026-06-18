@@ -1,0 +1,20 @@
+title: "Active Noise Control Systems: Algorithms and DSP Implementations"
+authors:
+  - "Sen M. Kuo"
+  - "Dennis R. Morgan"
+year: 1996
+venue: "Wiley book"
+doi: ""
+url: "https://www.wiley.com/en-us/Active+Noise+Control+Systems%3A+Algorithms+and+DSP+Implementations-p-9780471134244"
+source: "large_validation_seed"
+abstract: "Core ANC algorithms and DSP implementation reference; supports algorithmic rather than physical PNC changes."
+citation_count: 
+keywords:
+  - "ANC"
+  - "DSP"
+  - "FxLMS"
+arxiv_id: ""
+pmid: ""
+pdf_url: ""
+retrieved_at: "2026-06-17T05:19:22.132575Z"
+query: "large validation ANC comfort Bark loudness sound quality"
