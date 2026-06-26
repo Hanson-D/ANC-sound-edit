@@ -36,6 +36,53 @@ online_verification: "2026-06-26 使用 PubMed/NCBI E-utilities、ISCA Archive�
 | University of Salford | `Loudness and critical bands` 页面 | 页面说明 loudness 依赖频率内容；20 Hz 40 dB 比 1 kHz 40 dB 听起来更小；复杂声 loudness 需要 critical bandwidth；小于一个 critical bandwidth 的双音会部分 masking；specific loudness 可按 sone/Bark 表达并积分。 | Bark 分组、specific loudness、critical-band / masking 依据。 |
 | Google Scholar | `https://scholar.google.com/scholar?q=...` | 当前环境命令行访问返回 Google 403 Forbidden，因此未获得可核验 Scholar 结果。 | 不作为证据来源；后续可由人工在浏览器登录环境中补录 Scholar citation / related articles。 |
 
+### 0.3 扩展文献池：至少 20 篇新增核查方向
+
+> 目的：原 7 篇只能支撑“心理声学 ANC”主线，不足以解释使用边界、Bark 分组、1 kHz 前后频段调参、耳压/闷头和语音残留。下面文献池把证据拆成 7 个方向。`已入大库` 表示已经存在于 `research-evidence-vault/literature/index.md` 或对应 `papers/` 记录；`需补入 vault` 表示本轮线上检索发现但尚未整理成本地 paper note。
+
+| 方向 | 文献 | 状态 | 对本文应补强的结论 |
+|---|---|---|---|
+| ANC 物理边界 | Kuo & Morgan (1999). **Active Noise Control: A Tutorial Review**. DOI: `10.1109/5.763310` | 已入大库 | ANC 的有效性受波长、因果性、次级路径和空间控制区限制；可支撑“低频更适合 ANC，高频/开放佩戴更难稳定”。 |
+| ANC 物理边界 | Elliott & Nelson (1993). **Active noise control**. | 已入大库 | 支撑把“物理可控性”和“感知目标整形”分开：不能把某频点压不下去简单归因于调参不努力。 |
+| ANC 综述 | Shi et al. (2012). **Recent advances on active noise control: open issues and innovative applications**. DOI: `10.1017/atsip.2012.4` | 已入大库 | 支撑 ANC 在低频更有实用优势，以及开放问题包括稳健性、算法复杂度和实际应用约束。 |
+| ANC 工程实现 | Elliott (2001). **Signal Processing for Active Control**. | 已入大库 | 支撑把目标函数、次级路径、稳定性和实时实现作为调参边界，而不是只讨论目标曲线。 |
+| ANC 工程实现 | Kuo & Morgan (1996). **Active Noise Control Systems: Algorithms and DSP Implementations**. | 已入大库 | 支撑 DSP-only 调参方式：FxLMS、误差路径、滤波器实现、稳定性约束。 |
+| Loudness ANC | Sommerfeldt & Samuels (2001). **Incorporation of loudness measures in active noise control**. | 已入大库 | 直接补强“不要只最小化均方误差/声压，应把 loudness 纳入 ANC 评价或控制”。 |
+| Residual shaping | Kuo & Tsai (1994). **Residual Noise Shaping Technique for Active Noise Control Systems**. | 已入大库 | 支撑 residual shaping：目标不是单纯最低残余能量，而是塑造残余谱。 |
+| Active noise equalizer | Kuo et al. (1996). **Broadband Adaptive Noise Equalizer**. | 已入大库 | 支撑用户偏好/目标谱形可通过 adaptive noise equalizer 实现，而不只是降噪开关。 |
+| Equal-loudness shaping | Gan & Kuo (2005). **Adaptive noise equalizer with equal-loudness compensation**. | 已入大库 | 支撑以 equal-loudness 作为增益补偿/权重，不同频段不能用同一 dB 解释。 |
+| Local spectral reshaping | de Diego et al. (2004). **Multichannel active noise control system for local spectral reshaping of multifrequency noise**. | 已入大库 | 支撑“局部谱形重塑”在 ANC 中是正当方法，可用于 1 kHz 前后频段的相对残余控制。 |
+| Active sound quality | Ferrer et al. (2010). **Review and future perspectives on Active Sound Quality Control**. | 已入大库 | 支撑“降噪量不等于声品质改善”，ASQC 关注目标声品质和残余谱。 |
+| Sound-quality ANC | Jiang & Huang (2018). **Review of active noise control techniques with emphasis on sound quality enhancement**. | 已入大库 | 支撑把 residual sound quality enhancement 作为 ANC 设计目标。 |
+| Masking + psychoacoustic ANC | Belyi & Gan (2019). **Integrated psychoacoustic active noise control and masking**. DOI: `10.1016/j.apacoust.2018.10.027` | 已入大库 | 支撑可把 masking 与 ANC 结合，解释为什么相邻频带关系会影响残余可感知性。 |
+| Subband psychoacoustic ANC | Bao & Panahi (2011). **A psychoacoustic active noise control system based on delayless subband adaptive filtering**. | 已入大库 | 支撑把频带/子带作为实时 ANC 控制单位，便于落地 Bark 或近似 Bark target。 |
+| Spatial robustness | Koyama et al. (2021). **Spatial active noise control based on kernel interpolation of sound field**. DOI: `10.1109/TASLP.2021.3107983` | 已入大库 | 支撑头动/佩戴变化下的空间控制稳健性问题；半入耳不应只看单点曲线。 |
+| Personal ANC | Rudzynski (2012). **Performance of personal active noise reduction devices**. | 已入大库 | 支撑 personal device 的实际性能受佩戴、测量与结构限制影响。 |
+| Loudness 标准 | ISO 532-1 (2017). **Methods for calculating loudness**. | 已入大库 | 支撑 loudness / specific loudness 的标准化计算，适合作为 Bark 曲线客观指标。 |
+| Psychoacoustic 指标标准 | ECMA-418-2 (2022). **Psychoacoustic metrics for ITT equipment**. | 已入大库 | 支撑 loudness、sharpness、roughness、tonality 等指标作为声品质评价维度。 |
+| Bark / critical band | Zwicker & Fastl (2007). **Psychoacoustics: Facts and Models**. | 已入大库 | 支撑 Bark、critical band、masking、loudness、sharpness、roughness 的理论基础。 |
+| Roughness | Fastl (1982). **A procedure for calculating auditory roughness**. | 已入大库 | 支撑 roughness 是独立声品质维度，用于动态/调制残余噪声评价。 |
+| Sharpness | Fastl (1980). **Sharpness as an attribute of the timbre of steady sounds**. | 已入大库 | 支撑 2-5 kHz / high-Bark 能量可能增加 sharpness，应设 guardrail。 |
+| Pleasantness | Aures (1985). **Berechnungsverfahren für den sensorischen Wohlklang beliebiger Schallsignale**. | 已入大库 | 支撑 pleasantness 可由 loudness、sharpness、roughness、tonality 等组合建模。 |
+| Time-varying loudness | Moore, Glasberg & Baer (1997). **A model of loudness applicable to time-varying sounds**. | 已入大库 | 支撑 attack-release / 包络变化不能只看稳态频响，需要时间响度模型。 |
+| Equal-loudness | ISO 226 (2003). **Normal equal-loudness-level contours**. | 已入大库 | 支撑不同频率同 SPL 的主观响度不同，尤其低频与 1 kHz 不能直接按 dB 等价比较。 |
+| Speech band | French & Steinberg (1947). **Factors governing the intelligibility of speech sounds**. *JASA*. | 需补入 vault | 支撑 1-3 kHz 对 speech information 很关键；可解释 1 kHz 附近残留为何比宽频平均 dB 更影响突兀感。 |
+| Speech band | Kryter (1962). **Methods for the calculation and use of the Articulation Index**. *JASA*. | 需补入 vault | 支撑用 articulation / intelligibility 权重解释语音频带残留，而不是只看 ANC depth。 |
+| Speech band | ANSI/ASA S3.5. **Speech Intelligibility Index**. | 需补入 vault | 支撑建立“1-3 kHz 残留 prominence”和“人声突兀/可懂度”的客观 proxy。 |
+| Occlusion / 耳压 | Stenfelt & Reinfeldt (2007). **A model of the occlusion effect with bone-conducted stimulation**. *International Journal of Audiology*. | 需补入 vault | 支撑闷头/堵塞感与耳道 occlusion、骨导和低频耳道声压有关，不能只用外界降噪 dB 解释。 |
+| Open vs closed fit | Winkler, Latzel & Holube (2016). **Open Versus Closed Hearing-Aid Fittings: A Literature Review**. *Trends in Hearing*. | 需补入 vault | 支撑 open/vented fitting 可减轻 occlusion，但会改变低频和泄漏路径；适合解释半入耳舒适性。 |
+| Earplug comfort | Doutres et al. (2019). **A critical review of the literature on comfort of hearing protection devices**. *International Journal of Audiology*. | 需补入 vault | 支撑耳内佩戴 comfort 是多维属性，包括压力、疼痛、热、声学隔绝/闭塞等。 |
+| Occlusion mechanism | Carillo, Doutres & Sgard (2020). **Theoretical investigation of the low frequency fundamental mechanism of the objective occlusion effect induced by bone-conducted stimulation**. *JASA*. | 需补入 vault | 支撑低频 objective occlusion 的物理机制，可用于解释“耳压/闷”并非真实静压。 |
+| Open-ear ANC | Yuan et al. (2026). **Active noise cancellation on open-ear smart glasses**. arXiv:2604.05519 | 需补入 vault | 支撑 open-ear ANC 的目标频段和误差麦克风假设不同于入耳密封 ANC；可解释半入耳高频/中频控制受限。 |
+
+这些文献进入报告后的使用方式：
+
+- **1 kHz 前后频段为什么要调**：Cheong 2016、Kuo & Tsai 1994、de Diego 2004、Belyi & Gan 2019、French & Steinberg 1947、ANSI/ASA S3.5。
+- **为什么不是越深越舒适**：Priese 2013、Bao & Panahi 2010/2013、Aures 1985、Ferrer 2010、Jiang 2018。
+- **为什么 Bark 分组合理**：Zwicker & Fastl 2007、ISO 532-1、ISO 226、Salford 2024、ECMA-418-2。
+- **为什么半入耳会耳压/闷头**：Stenfelt & Reinfeldt 2007、Winkler et al. 2016、Doutres et al. 2019、Carillo et al. 2020。
+- **为什么要有使用边界**：Kuo & Morgan 1999、Elliott & Nelson 1993、Shi et al. 2012、Koyama et al. 2021、Yuan et al. 2026。
+
 #### 方法 A：DSP-only ANC target，不改物理 PNC
 
 - **适用边界**：耳机外形、耳塞/导管、开孔、材料、麦克风/扬声器位置不能改，只允许改变 ANC 控制目标、滤波器权重、目标增益、平滑和保护逻辑。
@@ -292,3 +339,40 @@ minimize:
 - Cheong, K.-M., Wang, Y.-Y., & Chi, T.-S. (2016). A Spectral Modulation Sensitivity Weighted Pre-emphasis Filter for Active Noise Control System. DOI: 10.21437/Interspeech.2016-757.
 - Rivera Benois, P., Papantoni, V., & Zölzer, U. (2018). Psychoacoustic Hybrid Active Noise Control Structure for Application in Headphones.
 - Acoustics Innovation Institute, University of Salford. Loudness and critical bands.
+
+### 扩展参考文献池
+
+以下文献用于补强本报告后续版本。`已入大库` 的条目已经在 `research-evidence-vault` 中有记录；`需补入 vault` 的条目需要后续建立 metadata、summary、quotes 和 critique。
+
+- Kuo, S. M., & Morgan, D. R. (1999). Active Noise Control: A Tutorial Review. DOI: 10.1109/5.763310. 已入大库。
+- Elliott, S. J., & Nelson, P. A. (1993). Active noise control. 已入大库。
+- Shi, D., et al. (2012). Recent advances on active noise control: open issues and innovative applications. DOI: 10.1017/atsip.2012.4. 已入大库。
+- Elliott, S. J. (2001). Signal Processing for Active Control. 已入大库。
+- Kuo, S. M., & Morgan, D. R. (1996). Active Noise Control Systems: Algorithms and DSP Implementations. 已入大库。
+- Sommerfeldt, S. D., & Samuels, W. R. (2001). Incorporation of loudness measures in active noise control. 已入大库。
+- Kuo, S. M., & Tsai, J. S. (1994). Residual Noise Shaping Technique for Active Noise Control Systems. 已入大库。
+- Kuo, S. M., et al. (1996). Broadband Adaptive Noise Equalizer. 已入大库。
+- Gan, W. S., & Kuo, S. M. (2005). Adaptive noise equalizer with equal-loudness compensation. 已入大库。
+- de Diego, M., et al. (2004). Multichannel active noise control system for local spectral reshaping of multifrequency noise. 已入大库。
+- Ferrer, M., et al. (2010). Review and future perspectives on Active Sound Quality Control. 已入大库。
+- Jiang, F., & Huang, X. (2018). Review of active noise control techniques with emphasis on sound quality enhancement. 已入大库。
+- Belyi, V., & Gan, W. S. (2019). Integrated psychoacoustic active noise control and masking. DOI: 10.1016/j.apacoust.2018.10.027. 已入大库。
+- Bao, H., & Panahi, I. M. S. (2011). A psychoacoustic active noise control system based on delayless subband adaptive filtering. 已入大库。
+- Koyama, S., et al. (2021). Spatial active noise control based on kernel interpolation of sound field. DOI: 10.1109/TASLP.2021.3107983. 已入大库。
+- Rudzynski, T. (2012). Performance of personal active noise reduction devices. 已入大库。
+- ISO 532-1 (2017). Methods for calculating loudness. 已入大库。
+- ECMA-418-2 (2022). Psychoacoustic metrics for ITT equipment. 已入大库。
+- Zwicker, E., & Fastl, H. (2007). Psychoacoustics: Facts and Models. 已入大库。
+- Fastl, H. (1982). A procedure for calculating auditory roughness. 已入大库。
+- Fastl, H. (1980). Sharpness as an attribute of the timbre of steady sounds. 已入大库。
+- Aures, W. (1985). Berechnungsverfahren für den sensorischen Wohlklang beliebiger Schallsignale. 已入大库。
+- Moore, B. C. J., Glasberg, B. R., & Baer, T. (1997). A model of loudness applicable to time-varying sounds. 已入大库。
+- ISO 226 (2003). Normal equal-loudness-level contours. 已入大库。
+- French, N. R., & Steinberg, J. C. (1947). Factors governing the intelligibility of speech sounds. 需补入 vault。
+- Kryter, K. D. (1962). Methods for the calculation and use of the Articulation Index. 需补入 vault。
+- ANSI/ASA S3.5. Speech Intelligibility Index. 需补入 vault。
+- Stenfelt, S., & Reinfeldt, S. (2007). A model of the occlusion effect with bone-conducted stimulation. 需补入 vault。
+- Winkler, A., Latzel, M., & Holube, I. (2016). Open Versus Closed Hearing-Aid Fittings: A Literature Review. 需补入 vault。
+- Doutres, O., Sgard, F., Terroir, J., Perrin, N., & Jolly, C. (2019). A critical review of the literature on comfort of hearing protection devices. 需补入 vault。
+- Carillo, K., Doutres, O., & Sgard, F. (2020). Theoretical investigation of the low frequency fundamental mechanism of the objective occlusion effect induced by bone-conducted stimulation. 需补入 vault。
+- Yuan, K., et al. (2026). Active noise cancellation on open-ear smart glasses. arXiv:2604.05519. 需补入 vault。
