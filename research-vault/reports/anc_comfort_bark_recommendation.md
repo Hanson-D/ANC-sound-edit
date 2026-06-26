@@ -83,6 +83,23 @@ online_verification: "2026-06-26 使用 PubMed/NCBI E-utilities、ISCA Archive�
 - **为什么半入耳会耳压/闷头**：Stenfelt & Reinfeldt 2007、Winkler et al. 2016、Doutres et al. 2019、Carillo et al. 2020。
 - **为什么要有使用边界**：Kuo & Morgan 1999、Elliott & Nelson 1993、Shi et al. 2012、Koyama et al. 2021、Yuan et al. 2026。
 
+### 0.4 扩展文献结论：频段调整、不舒适来源与预防
+
+> 读法：这一节把 0.3 的新增文献按工程问题重新归纳。`调整建议` 是基于文献结论的测试假设，不是单篇文献直接给出的产品参数；实际阈值仍需用本机曲线和听评确认。
+
+| 频段 / 问题 | 主要文献 | 文献结论 | 频段怎么调 | 不舒适来源 | 预防策略 |
+|---|---|---|---|---|---|
+| **20-300 Hz / Bark 0-3** 低频轰鸣、交通、机舱、抽吸感 | Kuo & Morgan 1999；Elliott & Nelson 1993；Shi et al. 2012；Rivera Benois et al. 2018；ISO 226 2003 | ANC 对低频更有实际优势；headphone hybrid ANC 通常用低频 feedback/ANC 处理；equal-loudness 说明低频 SPL 与主观响度不能直接等价。 | 可作为主降噪区，但不要追求瞬时极深；建议用较平滑的低频 target，并在动态噪声下限制增益变化率。 | 低频 target 快速变化、低频过深后环境被“抽空”、半入耳泄漏导致低频残余不稳定，可能被用户描述为耳压/抽吸。 | 设置低频 attack/release；监听低频 gain trace；若用户耳压升高，优先回退 Bark 0-3 的动态深度而非只看稳态 dB。 |
+| **300-920 Hz / Bark 3-7** 低中频浑浊、闷头主体 | Sommerfeldt & Samuels 2001；Gan & Kuo 2005；Zwicker & Fastl 2007；Salford 2024 | loudness / critical-band 方法比纯 SPL 更适合评价复杂声；equal-loudness compensation 支持不同频段用不同感知权重。 | 可以明显降，但要与 20-300 Hz 和 920 Hz-2.7 kHz 连续；不建议形成窄凹口。 | 低中频过深可能削弱环境包络和空间自然度，和半闭塞佩戴共同形成闷头感。 | 做 Bark 维度一阶/二阶平滑；听评单独问“闷、堵、头内”；若闷头升高，先回退 500-1000 Hz 2-3 dB 做 A/B。 |
+| **920 Hz-1.5 kHz / Bark 7-10** 1 kHz 能力受限区前后 | Kuo & Tsai 1994；Kuo et al. 1996；de Diego et al. 2004；Cheong et al. 2016；Belyi & Gan 2019 | residual noise shaping / active noise equalization / spectral modulation sensitivity 都支持“残余谱形”本身影响感知。 | 如果 1 kHz 压不下去，不要继续加深两侧制造更大相对峰；测试 `500-1000 Hz 回退`、`2-4 kHz 回退`、`两侧同时回退`、`平滑过渡`。 | 中心频点残余被两侧深降噪衬托出来，形成“中频凸起”，用户会觉得顶、近、头内、人声残留突兀。 | 用 `局部残余峰 = 1 kHz 残余 - 两侧残余均值` 作为客观特征；主观题加入“1 kHz/人声残留突兀”。 |
+| **1-3 kHz / Bark 9-16** 语音信息、提示音、存在感 | French & Steinberg 1947；Kryter 1962；ANSI/ASA S3.5；Priese 2013 | speech intelligibility / articulation / SII 文献支持 1-3 kHz 对语音信息重要；Priese 指出舒适不只由 loudness 决定。 | 不建议在办公室/人声场景把 1-3 kHz 做成大峰谷；若中心频点受限，优先让相邻频段连续，而不是最大化局部 attenuation。 | 语音残片、人声清晰度线索或机械中频残留被凸显，会造成“安静但烦”“更能注意到某些声源”。 | 按场景区分 target：通勤可更深，办公室/人声场景保守；计算 SII/AI proxy 或 1-3 kHz residual prominence。 |
+| **2.7-5.3 kHz / Bark 15-19** 高敏感、sharpness、刺耳 | Priese 2013；Fastl 1980；Bao & Panahi 2010/2013；ECMA-418-2 2022 | 2-5 kHz 是人耳敏感区；sharpness 是独立声品质维度；psychoacoustic ANC 应同时看 loudness、sharpness、roughness、tonality。 | 禁止正增益或泄漏补偿放大；若 ANC 不稳定，不追求深降噪，优先避免 sharpness 上升。 | 高频敏感区残余或补偿放大会带来刺、薄、疲劳；2-4 kHz 过深也可能削弱开放感和外化线索。 | 设置 high-Bark guardrail；总 loudness 降低但 sharpness 上升时回退；主观题加入“刺耳/疲劳/空气感”。 |
+| **5.3-15.5 kHz / Bark 19-24** hiss、尖锐、高频伪影 | ECMA-418-2 2022；Bao & Panahi 2010/2013；Rivera Benois et al. 2018 | 高阶声品质指标包含 sharpness、roughness、tonality；headphone pleasantness 受 PNC 强影响。 | 半入耳高频 ANC 保守处理；更多监控 hiss、tonal peak、roughness，不以深降噪为核心 KPI。 | 高频 hiss、窄带啸叫、电子伪影会让“更小声”变成“更烦”。 | 保留窄带 peak detector；发现 tonal peak 时局部 notch 或回退，不要整段 Bark 加深。 |
+| **全频 Bark 间关系** 谱形锯齿、局部峰谷 | Cheong et al. 2016；Zwicker & Fastl 2007；Salford 2024；Belyi & Gan 2019 | spectral modulation sensitivity、critical-band masking / summation、integrated masking 都说明频带关系影响感知。 | 对 target 加一阶/二阶 Bark 平滑；重点检查 500 Hz-4 kHz 的局部峰谷。 | 局部凹陷会凸显邻近频段残留，局部峰值会造成声染色和突兀。 | 控制相邻 Bark slope 和 3-Bark peak-valley；用平滑曲线与最大降噪曲线做听评对照。 |
+| **时间维度** pumping、roughness、变化可察觉 | Moore et al. 1997；Fastl 1982；ECMA-418-2 2022；Cheong et al. 2016 | time-varying loudness、roughness 和 temporal/spectral modulation 都是感知维度；稳态频响不足以解释动态舒适性。 | 对低频和中频 target 加时间平滑；突发噪声不瞬时追到最大深度，release 不瞬间释放。 | 增益快速跳变导致 pumping、压迫、抽吸或“系统在动”的感觉。 | 记录 gain trace；听评加入“变化感/抽吸感/动态压迫”；动态曲线单独验证。 |
+| **半入耳 / open-fit / occlusion** 耳压、堵塞、自声、闷头 | Stenfelt & Reinfeldt 2007；Winkler et al. 2016；Doutres et al. 2019；Carillo et al. 2020 | occlusion effect 与耳道声阻抗、骨导声、低频耳道声压有关；open/vented fitting 可减轻 occlusion，但会引入泄漏与低频控制难题；佩戴 comfort 是多维属性。 | 不把半入耳调成“主观封闭”；低中频不要过度抽空；保留适度外界连续线索。 | 用户说“耳压”可能不是静压，而是低频闭塞、头内声、自声/体声增强和环境谱被挖空的综合感受。 | 听评拆分耳压、闷头、自声、头内感、自然度；对舒适默认曲线回退低中频过深段。 |
+| **open-ear ANC 稳健性** 佩戴差异、误差点不稳定 | Koyama et al. 2021；Rudzynski 2012；Yuan et al. 2026；Kuo & Morgan 1999 | 个人 ANC / open-ear ANC 受空间控制、佩戴、误差点和声场估计影响；开放耳设计不能照搬密封入耳假设。 | 半入耳 target 不应只按单次最佳佩戴曲线制定；1 kHz 以上尤其要看多佩戴/多用户稳健性。 | 某条曲线在 HATS 或单用户上好，但换佩戴后出现峰谷、伪影、突兀残留。 | 每条候选 target 做 reinsertion / 多用户测量；用稳健性下限而不是最佳曲线决定默认 target。 |
+
 #### 方法 A：DSP-only ANC target，不改物理 PNC
 
 - **适用边界**：耳机外形、耳塞/导管、开孔、材料、麦克风/扬声器位置不能改，只允许改变 ANC 控制目标、滤波器权重、目标增益、平滑和保护逻辑。
