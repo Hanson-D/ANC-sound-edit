@@ -13,6 +13,7 @@ import traceback
 import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox
+from typing import List
 import tkinter as tk
 from tkinter import ttk
 
@@ -446,6 +447,10 @@ class AncReboundGui(tk.Tk):
         chart = {
             "type": "time",
             "x": frame_times_s,
+            "x_scale": "linear",
+            "x_label": "时间 (s)",
+            "y_label": "目标频段 RMS / 增益 (dB)",
+            "description": "可视化对象：PNC、原始TNC、控制后TNC 的目标频段短窗RMS，以及施加到TNC目标频段的增益。",
             "series": [
                 ("PNC", pnc_rms_db, "#2563eb"),
                 ("原始 TNC", tnc_rms_db, "#d12f2f"),
@@ -494,6 +499,11 @@ class AncReboundGui(tk.Tk):
         chart = {
             "type": "frequency",
             "x": curves["freq_hz"][curves["freq_hz"] <= min(max(end_hz * 2.0, end_hz + 100, 200), curves["freq_hz"][-1])],
+            "x_range": (1.0, max(end_hz * 2.0, end_hz + 100, 200)),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "ANC 降噪量 (dB)",
+            "description": "可视化对象：按 ANC=PNC(dB)-TNC(dB) 得到的原始、目标、修改后 ANC 降噪量曲线。",
             "band": (start_hz, end_hz),
             "series": [],
             "title": "ANC 降噪量斜率",
@@ -536,6 +546,11 @@ class AncReboundGui(tk.Tk):
         return {
             "type": "frequency",
             "x": freqs[mask],
+            "x_range": (1.0, max(high_hz * 2.5, high_hz + 200, 250)),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "幅度 (dB)",
+            "description": "可视化对象：OpenEar、PNC、原始TNC、处理后TNC 的频谱幅度曲线。",
             "band": (low_hz, high_hz),
             "series": [
                 ("OpenEar", curves["open_db"][mask], "#6b7280"),
@@ -627,8 +642,16 @@ class AncReboundGui(tk.Tk):
         self.canvas.delete("all")
         width = max(self.canvas.winfo_width(), 200)
         height = max(self.canvas.winfo_height(), 200)
-        x0, y0, x1, y1 = 70, 54, width - 24, height - 64
+        x0, y0, x1, y1 = 84, 76, width - 24, height - 76
         self.canvas.create_text(20, 18, text=chart["title"], anchor="w", font=("Segoe UI", 13, "bold"))
+        self.canvas.create_text(
+            20,
+            42,
+            text=chart.get("description", ""),
+            anchor="w",
+            fill="#4b5563",
+            font=("Segoe UI", 9),
+        )
         self.canvas.create_rectangle(x0, y0, x1, y1, fill="#ffffff", outline="#d1d5db")
         x_values = np.asarray(chart["x"], dtype=float)
         if len(x_values) < 2:
@@ -644,24 +667,51 @@ class AncReboundGui(tk.Tk):
         pad = (ymax - ymin) * 0.1
         ymin -= pad
         ymax += pad
-        xmin, xmax = float(x_values[0]), float(x_values[-1])
+        x_scale = chart.get("x_scale", "linear")
+        if "x_range" in chart:
+            xmin, xmax = chart["x_range"]
+        else:
+            xmin, xmax = float(x_values[0]), float(x_values[-1])
+        data_xmin, data_xmax = float(x_values[0]), float(x_values[-1])
+        if x_scale == "log":
+            positive_x = x_values[x_values > 0]
+            if len(positive_x) == 0:
+                return
+            xmin = max(float(xmin), min(1.0, float(np.min(positive_x))))
+            xmax = max(float(xmax), xmin * 10.0)
+        if xmax <= xmin:
+            xmax = xmin + 1.0
+
+        def x_to_px(value: float) -> float:
+            if x_scale == "log":
+                safe_value = max(value, xmin)
+                return x0 + (np.log10(safe_value) - np.log10(xmin)) / max(np.log10(xmax) - np.log10(xmin), 1e-9) * (x1 - x0)
+            return x0 + (value - xmin) / max(xmax - xmin, 1e-9) * (x1 - x0)
 
         if chart.get("band"):
             low, high = chart["band"]
-            bx0 = x0 + (low - xmin) / max(xmax - xmin, 1e-9) * (x1 - x0)
-            bx1 = x0 + (high - xmin) / max(xmax - xmin, 1e-9) * (x1 - x0)
+            bx0 = x_to_px(max(low, xmin))
+            bx1 = x_to_px(max(high, xmin))
             self.canvas.create_rectangle(bx0, y0, bx1, y1, fill="#f6c453", outline="", stipple="gray25")
 
-        for i in range(6):
-            tick = xmin + (xmax - xmin) * i / 5
-            x = x0 + (tick - xmin) / max(xmax - xmin, 1e-9) * (x1 - x0)
+        for tick in self.x_ticks(xmin, xmax, x_scale):
+            x = x_to_px(tick)
             self.canvas.create_line(x, y1, x, y1 + 5, fill="#6b7280")
-            self.canvas.create_text(x, y1 + 18, text=f"{tick:.1f}", fill="#374151", font=("Segoe UI", 9))
+            self.canvas.create_text(x, y1 + 18, text=self.format_tick(tick), fill="#374151", font=("Segoe UI", 9))
         for i in range(5):
             tick = ymin + (ymax - ymin) * i / 4
             y = y1 - (tick - ymin) / max(ymax - ymin, 1e-9) * (y1 - y0)
             self.canvas.create_line(x0 - 5, y, x0, y, fill="#6b7280")
             self.canvas.create_text(x0 - 8, y, text=f"{tick:.1f}", anchor="e", fill="#374151", font=("Segoe UI", 9))
+        self.canvas.create_text((x0 + x1) / 2, height - 24, text=chart.get("x_label", ""), fill="#111827", font=("Segoe UI", 10))
+        self.canvas.create_text(
+            18,
+            (y0 + y1) / 2,
+            text=chart.get("y_label", ""),
+            angle=90,
+            fill="#111827",
+            font=("Segoe UI", 10),
+        )
 
         legend_x = x0 + 10
         for idx, (name, values, color) in enumerate(chart["series"]):
@@ -671,13 +721,33 @@ class AncReboundGui(tk.Tk):
             values = np.asarray(values, dtype=float)
             points = []
             for x_val, y_val in zip(x_values, values):
-                if not np.isfinite(y_val):
+                if not np.isfinite(y_val) or x_val < xmin or x_val > xmax or (x_scale == "log" and x_val <= 0):
                     continue
-                x = x0 + (x_val - xmin) / max(xmax - xmin, 1e-9) * (x1 - x0)
+                x = x_to_px(float(x_val))
                 y = y1 - (y_val - ymin) / max(ymax - ymin, 1e-9) * (y1 - y0)
                 points.extend([x, y])
             if len(points) >= 4:
                 self.canvas.create_line(*points, fill=color, width=2)
+
+    def x_ticks(self, xmin: float, xmax: float, scale: str) -> List[float]:
+        if scale != "log":
+            return [xmin + (xmax - xmin) * i / 5 for i in range(6)]
+        ticks = []
+        start_power = int(np.floor(np.log10(max(xmin, 1e-9))))
+        end_power = int(np.ceil(np.log10(max(xmax, xmin * 10))))
+        for power in range(start_power, end_power + 1):
+            for multiplier in (1, 2, 5):
+                value = multiplier * (10 ** power)
+                if xmin <= value <= xmax:
+                    ticks.append(float(value))
+        return ticks
+
+    def format_tick(self, value: float) -> str:
+        if value >= 1000:
+            return f"{value / 1000:g}k"
+        if value >= 10:
+            return f"{value:.0f}"
+        return f"{value:g}"
 
     def show_error(self, text: str) -> None:
         self.status_var.set("出错")
