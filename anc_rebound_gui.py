@@ -84,8 +84,8 @@ class AncReboundGui(tk.Tk):
         self.slope_mode_var = tk.StringVar(value="平缓")
         self.slope_start_reduction_var = tk.StringVar(value="0")
         self.slope_end_reduction_var = tk.StringVar(value="0")
-        self.slope_start_transition_var = tk.StringVar(value="0")
-        self.slope_end_transition_var = tk.StringVar(value="0")
+        self.slope_start_transition_var = tk.StringVar(value="10")
+        self.slope_end_transition_var = tk.StringVar(value="10")
         self.status_var = tk.StringVar(value="就绪")
         self.last_output_dir: Path | None = None
 
@@ -614,6 +614,10 @@ class AncReboundGui(tk.Tk):
             ("修改后 ANC", modified_anc, "#111827"),
         ]
         freqs = curves["freq_hz"]
+        boost_scale = float(curves.get("boost_scale", np.asarray([1.0]))[0])
+        input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
+        output_peak = float(curves.get("output_peak", np.asarray([0.0]))[0])
+        peak_note = f"boost缩放={boost_scale * 100:.1f}%; 峰值 {input_peak:.3f}->{output_peak:.3f}"
         slope_rows = [
             {
                 "kind": "ANC 斜率",
@@ -633,7 +637,7 @@ class AncReboundGui(tk.Tk):
                 "duration": f"有效宽度={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['effective_transition_width_hz']:.1f}Hz",
                 "max_db": f"{slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['max_local_slope'] * 10:.3f}/10Hz",
                 "mean_db": f"p95={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['p95_local_slope'] * 10:.3f}/10Hz",
-                "extra": f"集中度={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}; {mode_label}",
+                "extra": f"集中度={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}; {mode_label}; {peak_note}",
             },
         ]
         return {"mode": "slope", "output_dir": out_dir, "report": report_path, "slope_rows": slope_rows, "chart": chart}

@@ -143,13 +143,38 @@ def flatten_anc_slope(
     target_tnc_db = pnc_db - target_anc_db
     gain_db = target_tnc_db - tnc_db
     gain_db = np.clip(gain_db, -abs(max_cut_db), abs(max_boost_db))
-    gain = 10.0 ** (gain_db / 20.0)
 
-    output = np.zeros_like(tnc_samples)
-    for channel in range(tnc_samples.shape[1]):
-        spec = stft(tnc_samples[:, channel], frame_size, hop_size)
-        spec[:, band] *= gain[band][None, :]
-        output[:, channel] = istft(spec, frame_size, hop_size, len(tnc_samples))
+    def apply_gain(candidate_gain_db: np.ndarray) -> np.ndarray:
+        gain = 10.0 ** (candidate_gain_db / 20.0)
+        candidate = np.zeros_like(tnc_samples)
+        for channel in range(tnc_samples.shape[1]):
+            spec = stft(tnc_samples[:, channel], frame_size, hop_size)
+            spec[:, band] *= gain[band][None, :]
+            candidate[:, channel] = istft(spec, frame_size, hop_size, len(tnc_samples))
+        return candidate
+
+    output = apply_gain(gain_db)
+    input_peak = float(np.max(np.abs(tnc_samples))) if tnc_samples.size else 0.0
+    output_peak = float(np.max(np.abs(output))) if output.size else 0.0
+    peak_limit = max(input_peak, 1.0 - (1.0 / 32768.0))
+    boost_scale = 1.0
+    positive_gain = gain_db > 0
+    if output_peak > peak_limit and np.any(positive_gain):
+        low, high = 0.0, 1.0
+        best_output = apply_gain(np.where(positive_gain, 0.0, gain_db))
+        for _ in range(18):
+            mid = (low + high) / 2.0
+            candidate_gain_db = np.where(positive_gain, gain_db * mid, gain_db)
+            candidate = apply_gain(candidate_gain_db)
+            candidate_peak = float(np.max(np.abs(candidate))) if candidate.size else 0.0
+            if candidate_peak <= peak_limit:
+                low = mid
+                best_output = candidate
+            else:
+                high = mid
+        boost_scale = low
+        gain_db = np.where(positive_gain, gain_db * boost_scale, gain_db)
+        output = best_output
 
     _, modified_tnc_db = mean_stft_magnitude_db(output, sample_rate, frame_size, hop_size)
     modified_anc_db = pnc_db - modified_tnc_db
@@ -163,6 +188,9 @@ def flatten_anc_slope(
         "modified_anc_db": modified_anc_db,
         "gain_db": gain_db,
         "band_mask": band,
+        "boost_scale": np.asarray([boost_scale], dtype=np.float64),
+        "input_peak": np.asarray([input_peak], dtype=np.float64),
+        "output_peak": np.asarray([float(np.max(np.abs(output))) if output.size else 0.0], dtype=np.float64),
     }
     return output, curves
 
@@ -381,6 +409,17 @@ def write_report_html(
             f"<td>{metrics['concentration_ratio']:.2f}</td>"
             "</tr>"
         )
+    boost_scale = float(curves.get("boost_scale", np.asarray([1.0]))[0])
+    input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
+    output_peak = float(curves.get("output_peak", np.asarray([0.0]))[0])
+    clip_note = (
+        f"<p>Peak protection reduced positive boost to <strong>{boost_scale * 100:.1f}%</strong> "
+        f"to avoid creating new WAV clipping. Input peak: <strong>{input_peak:.4f}</strong>; "
+        f"output peak: <strong>{output_peak:.4f}</strong>.</p>"
+        if boost_scale < 0.999
+        else f"<p>Peak protection did not reduce positive boost. Input peak: <strong>{input_peak:.4f}</strong>; "
+        f"output peak: <strong>{output_peak:.4f}</strong>.</p>"
+    )
     svg = svg_path.read_text(encoding="utf-8")
     html_text = f"""<!doctype html>
 <html lang="en">
@@ -404,6 +443,7 @@ code {{ background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }}
 <p>ANC definition: <code>PNC_dB - TNC_dB</code>. Replacement range: <strong>{start_hz:g}-{end_hz:g} Hz</strong>. Mode: <strong>{html.escape(mode)}</strong>.</p>
 <p>Endpoint depth reduction: start <strong>{start_depth_reduction_db:g} dB</strong>, end <strong>{end_depth_reduction_db:g} dB</strong>. A positive value makes the ANC depth shallower at that endpoint before smoothing.</p>
 <p>Transition width: start side <strong>{start_transition_hz:g} Hz</strong>, end side <strong>{end_transition_hz:g} Hz</strong>. These transition bands smooth the connection back to the original ANC curve.</p>
+{clip_note}
 <p>Because start and end values are fixed, average slope is mostly a reference. The main steepness checks are max local slope, p95 local slope, effective transition width, and concentration ratio.</p>
 <h2>Files</h2>
 <ul>
@@ -437,8 +477,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mode", choices=["smoothstep", "linear"], default="smoothstep")
     parser.add_argument("--start-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the start point before smoothing")
     parser.add_argument("--end-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the end point before smoothing")
-    parser.add_argument("--start-transition-hz", type=float, default=0.0, help="smooth-in width before the start point")
-    parser.add_argument("--end-transition-hz", type=float, default=0.0, help="smooth-out width after the end point")
+    parser.add_argument("--start-transition-hz", type=float, default=10.0, help="smooth-in width before the start point")
+    parser.add_argument("--end-transition-hz", type=float, default=10.0, help="smooth-out width after the end point")
     parser.add_argument("--output-dir", type=Path, default=Path("out/anc_slope"))
     parser.add_argument("--frame-size", type=int, default=8192)
     parser.add_argument("--hop-size", type=int, default=2048)
