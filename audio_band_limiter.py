@@ -17,7 +17,7 @@ import struct
 import wave
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable, List, Tuple
 
 import numpy as np
 
@@ -258,17 +258,38 @@ def simplify_curve(
     return freqs[indexes], values[indexes]
 
 
+def simplify_curve_log(
+    freqs: np.ndarray,
+    values: np.ndarray,
+    max_points: int = 1800,
+    min_hz: float = 1.0,
+) -> Tuple[np.ndarray, np.ndarray]:
+    positive = np.asarray(freqs) >= min_hz
+    freqs = np.asarray(freqs)[positive]
+    values = np.asarray(values)[positive]
+    if len(freqs) <= max_points:
+        return freqs, values
+    targets = np.geomspace(max(min_hz, float(freqs[0])), float(freqs[-1]), max_points)
+    indexes = np.unique(np.searchsorted(freqs, targets).clip(0, len(freqs) - 1))
+    return freqs[indexes], values[indexes]
+
+
 def svg_polyline(
     freqs: np.ndarray,
     values: np.ndarray,
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
     box: Tuple[float, float, float, float],
+    x_scale: str = "linear",
 ) -> str:
     x0, y0, width, height = box
     f0, f1 = x_range
     v0, v1 = y_range
-    x = x0 + (freqs - f0) / max(f1 - f0, EPS) * width
+    if x_scale == "log":
+        safe_freqs = np.maximum(freqs, f0)
+        x = x0 + (np.log10(safe_freqs) - np.log10(f0)) / max(np.log10(f1) - np.log10(f0), EPS) * width
+    else:
+        x = x0 + (freqs - f0) / max(f1 - f0, EPS) * width
     y = y0 + height - (values - v0) / max(v1 - v0, EPS) * height
     points = " ".join(f"{px:.2f},{py:.2f}" for px, py in zip(x, y))
     return points
@@ -287,6 +308,18 @@ def nice_range(values: Iterable[np.ndarray], padding: float = 0.08) -> Tuple[flo
     return lo - pad, hi + pad
 
 
+def log_ticks(min_hz: float, max_hz: float) -> List[float]:
+    ticks = []
+    start_power = int(np.floor(np.log10(max(min_hz, EPS))))
+    end_power = int(np.ceil(np.log10(max(max_hz, min_hz * 10.0))))
+    for power in range(start_power, end_power + 1):
+        for multiplier in (1, 2, 5):
+            value = float(multiplier * (10 ** power))
+            if min_hz <= value <= max_hz:
+                ticks.append(value)
+    return ticks
+
+
 def write_spectrum_svg(
     path: Path,
     audio_a: WavAudio,
@@ -302,22 +335,23 @@ def write_spectrum_svg(
     freqs_b, mag_b, phase_b = spectrum_curve(audio_b.samples, audio_b.sample_rate)
     freqs_p, mag_p, phase_p = spectrum_curve(processed, audio_a.sample_rate)
 
-    max_freq = min(audio_a.sample_rate, audio_b.sample_rate) / 2.0
-    visible = lambda f: f <= max_freq
+    max_freq = min(min(audio_a.sample_rate, audio_b.sample_rate) / 2.0, 22000.0)
+    min_freq = 1.0
+    visible = lambda f: (f >= min_freq) & (f <= max_freq)
     freqs_a, mag_a, phase_a = freqs_a[visible(freqs_a)], mag_a[visible(freqs_a)], phase_a[visible(freqs_a)]
     freqs_b, mag_b, phase_b = freqs_b[visible(freqs_b)], mag_b[visible(freqs_b)], phase_b[visible(freqs_b)]
     freqs_p, mag_p, phase_p = freqs_p[visible(freqs_p)], mag_p[visible(freqs_p)], phase_p[visible(freqs_p)]
 
-    fa_m, ma = simplify_curve(freqs_a, mag_a)
-    fb_m, mb = simplify_curve(freqs_b, mag_b)
-    fp_m, mp = simplify_curve(freqs_p, mag_p)
-    fa_p, pa = simplify_curve(freqs_a, phase_a)
-    fb_p, pb = simplify_curve(freqs_b, phase_b)
-    fp_p, pp = simplify_curve(freqs_p, phase_p)
+    fa_m, ma = simplify_curve_log(freqs_a, mag_a, min_hz=min_freq)
+    fb_m, mb = simplify_curve_log(freqs_b, mag_b, min_hz=min_freq)
+    fp_m, mp = simplify_curve_log(freqs_p, mag_p, min_hz=min_freq)
+    fa_p, pa = simplify_curve_log(freqs_a, phase_a, min_hz=min_freq)
+    fb_p, pb = simplify_curve_log(freqs_b, phase_b, min_hz=min_freq)
+    fp_p, pp = simplify_curve_log(freqs_p, phase_p, min_hz=min_freq)
 
     mag_range = nice_range([ma, mb, mp])
     phase_range = nice_range([pa, pb, pp])
-    x_range = (0.0, max_freq)
+    x_range = (min_freq, max_freq)
     width, height = 1200, 760
     margin_l, margin_r = 78, 34
     plot_w = width - margin_l - margin_r
@@ -325,23 +359,26 @@ def write_spectrum_svg(
     phase_box = (margin_l, 438, plot_w, 250)
 
     def line(freqs: np.ndarray, values: np.ndarray, yr: Tuple[float, float], box, color: str) -> str:
-        points = svg_polyline(freqs, values, x_range, yr, box)
+        points = svg_polyline(freqs, values, x_range, yr, box, x_scale="log")
         return f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="2" />'
 
     def band_rect(box) -> str:
         x0, y0, w, h = box
-        bx = x0 + (low_hz - x_range[0]) / max(x_range[1] - x_range[0], EPS) * w
-        bw = (high_hz - low_hz) / max(x_range[1] - x_range[0], EPS) * w
-        bx = max(x0, min(x0 + w, bx))
-        bw = max(0, min(x0 + w - bx, bw))
+        low = max(low_hz, x_range[0])
+        high = min(high_hz, x_range[1])
+        if high <= low:
+            return ""
+        bx = x0 + (np.log10(low) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bx1 = x0 + (np.log10(high) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bw = max(0, bx1 - bx)
         return f'<rect x="{bx:.2f}" y="{y0}" width="{bw:.2f}" height="{h}" fill="#f6c453" opacity="0.18" />'
 
     def axes(box, y_label: str) -> str:
         x0, y0, w, h = box
-        ticks = [0, max_freq * 0.25, max_freq * 0.5, max_freq * 0.75, max_freq]
+        ticks = log_ticks(x_range[0], x_range[1])
         tick_svg = []
         for tick in ticks:
-            x = x0 + (tick / max_freq) * w if max_freq else x0
+            x = x0 + (np.log10(tick) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
             label = f"{tick / 1000:.1f}k" if tick >= 1000 else f"{tick:.0f}"
             tick_svg.append(
                 f'<line x1="{x:.2f}" y1="{y0+h}" x2="{x:.2f}" y2="{y0+h+6}" stroke="#6b7280" />'
@@ -368,7 +405,7 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 {line(fa_m, ma, mag_range, mag_box, "#d12f2f")}
 {line(fb_m, mb, mag_range, mag_box, "#2563eb")}
 {line(fp_m, mp, mag_range, mag_box, "#111827")}
-<text x="78" y="374">Frequency (Hz)</text>
+<text x="78" y="374">Frequency (Hz, log scale)</text>
 <circle cx="938" cy="360" r="5" fill="#d12f2f" /><text x="950" y="365">A original</text>
 <circle cx="1034" cy="360" r="5" fill="#2563eb" /><text x="1046" y="365">B</text>
 <circle cx="1084" cy="360" r="5" fill="#111827" /><text x="1096" y="365">A processed</text>
@@ -377,7 +414,7 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 {line(fa_p, pa, phase_range, phase_box, "#d12f2f")}
 {line(fb_p, pb, phase_range, phase_box, "#2563eb")}
 {line(fp_p, pp, phase_range, phase_box, "#111827")}
-<text x="78" y="724">Frequency (Hz)</text>
+<text x="78" y="724">Frequency (Hz, log scale)</text>
 </svg>
 """
     path.write_text(svg, encoding="utf-8")

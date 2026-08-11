@@ -27,11 +27,12 @@ from audio_band_limiter import (
     istft,
     nice_range,
     read_wav,
-    simplify_curve,
+    simplify_curve_log,
     spectrum_curve,
     stft,
     svg_polyline,
     write_wav,
+    log_ticks,
 )
 
 
@@ -250,9 +251,10 @@ def write_curve_csv(
 def write_svg(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz: float, title: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
-    max_freq = min(max(end_hz * 2.0, end_hz + 100.0, 200.0), float(freqs[-1]))
-    visible = freqs <= max_freq
-    x_range = (0.0, max_freq)
+    min_freq = 1.0
+    max_freq = min(float(freqs[-1]), 22000.0)
+    visible = (freqs >= min_freq) & (freqs <= max_freq)
+    x_range = (min_freq, max_freq)
     width, height = 1240, 820
     margin_l, margin_r = 82, 36
     plot_w = width - margin_l - margin_r
@@ -265,7 +267,7 @@ def write_svg(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz
         ("target_anc_db", "#2563eb", "Target ANC"),
         ("modified_anc_db", "#111827", "Modified ANC"),
     ]:
-        f, v = simplify_curve(freqs[visible], curves[key][visible])
+        f, v = simplify_curve_log(freqs[visible], -curves[key][visible], min_hz=min_freq)
         anc_series.append((f, v, color, label))
 
     tnc_series = []
@@ -274,7 +276,7 @@ def write_svg(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz
         ("original_tnc_db", "#d12f2f", "Original TNC"),
         ("modified_tnc_db", "#111827", "Modified TNC"),
     ]:
-        f, v = simplify_curve(freqs[visible], curves[key][visible])
+        f, v = simplify_curve_log(freqs[visible], curves[key][visible], min_hz=min_freq)
         tnc_series.append((f, v, color, label))
 
     anc_range = nice_range([item[1] for item in anc_series])
@@ -283,11 +285,12 @@ def write_svg(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz
     def axes(box, y_label):
         x0, y0, w, h = box
         ticks = []
-        for tick in np.linspace(x_range[0], x_range[1], 6):
-            x = x0 + (tick - x_range[0]) / max(x_range[1] - x_range[0], EPS) * w
+        for tick in log_ticks(x_range[0], x_range[1]):
+            x = x0 + (np.log10(tick) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+            label = f"{tick / 1000:g}k" if tick >= 1000 else f"{tick:g}"
             ticks.append(
                 f'<line x1="{x:.2f}" y1="{y0+h}" x2="{x:.2f}" y2="{y0+h+6}" stroke="#6b7280" />'
-                f'<text x="{x:.2f}" y="{y0+h+24}" text-anchor="middle">{tick:.0f}</text>'
+                f'<text x="{x:.2f}" y="{y0+h+24}" text-anchor="middle">{label}</text>'
             )
         return (
             f'<rect x="{x0}" y="{y0}" width="{w}" height="{h}" fill="#ffffff" stroke="#d1d5db" />'
@@ -298,13 +301,18 @@ def write_svg(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz
 
     def band_rect(box):
         x0, y0, w, h = box
-        bx = x0 + (start_hz - x_range[0]) / max(x_range[1] - x_range[0], EPS) * w
-        bw = (end_hz - start_hz) / max(x_range[1] - x_range[0], EPS) * w
+        low = max(start_hz, x_range[0])
+        high = min(end_hz, x_range[1])
+        if high <= low:
+            return ""
+        bx = x0 + (np.log10(low) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bx1 = x0 + (np.log10(high) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bw = bx1 - bx
         return f'<rect x="{bx:.2f}" y="{y0}" width="{bw:.2f}" height="{h}" fill="#f6c453" opacity="0.18" />'
 
     def line(freq, values, y_range, box, color, width_px=2.0):
         return (
-            f'<polyline points="{svg_polyline(freq, values, x_range, y_range, box)}" '
+            f'<polyline points="{svg_polyline(freq, values, x_range, y_range, box, x_scale="log")}" '
             f'fill="none" stroke="{color}" stroke-width="{width_px}" />'
         )
 
@@ -317,15 +325,15 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 </style>
 <rect width="100%" height="100%" fill="#f9fafb" />
 <text class="title" x="40" y="42">{html.escape(title)}</text>
-<text class="small" x="40" y="66">ANC contribution is PNC dB - TNC dB. Yellow band is the replaced slope segment.</text>
-<text class="section" x="82" y="82">ANC contribution curve</text>
-{axes(anc_box, "ANC dB")}
+<text class="small" x="40" y="66">ANC is shown as attenuation depth: negative values mean stronger noise reduction. Yellow band is the replaced slope segment.</text>
+<text class="section" x="82" y="82">ANC attenuation depth curve</text>
+{axes(anc_box, "ANC depth dB")}
 {band_rect(anc_box)}
 {''.join(line(f, v, anc_range, anc_box, c, 2.4 if label == "Modified ANC" else 2.0) for f, v, c, label in anc_series)}
 <circle cx="806" cy="410" r="5" fill="#d12f2f" /><text x="818" y="415">Original ANC</text>
 <circle cx="938" cy="410" r="5" fill="#2563eb" /><text x="950" y="415">Target ANC</text>
 <circle cx="1058" cy="410" r="5" fill="#111827" /><text x="1070" y="415">Modified ANC</text>
-<text x="82" y="438">Frequency (Hz)</text>
+<text x="82" y="438">Frequency (Hz, log scale)</text>
 <text class="section" x="82" y="490">PNC and TNC spectra</text>
 {axes(tnc_box, "Magnitude dB")}
 {band_rect(tnc_box)}
@@ -333,7 +341,7 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 <circle cx="788" cy="728" r="5" fill="#6b7280" /><text x="800" y="733">PNC</text>
 <circle cx="852" cy="728" r="5" fill="#d12f2f" /><text x="864" y="733">Original TNC</text>
 <circle cx="990" cy="728" r="5" fill="#111827" /><text x="1002" y="733">Modified TNC</text>
-<text x="82" y="728">Frequency (Hz)</text>
+<text x="82" y="728">Frequency (Hz, log scale)</text>
 </svg>
 """
     path.write_text(svg, encoding="utf-8")

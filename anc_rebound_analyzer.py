@@ -29,11 +29,12 @@ from audio_band_limiter import (
     istft,
     nice_range,
     read_wav,
-    simplify_curve,
+    simplify_curve_log,
     spectrum_curve,
     stft,
     svg_polyline,
     write_wav,
+    log_ticks,
 )
 
 
@@ -483,29 +484,31 @@ def write_rebound_svg(
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
-    max_freq = max(high_hz * 2.5, high_hz + 200.0, 250.0)
-    max_freq = min(max_freq, float(freqs[-1]))
-    visible = freqs <= max_freq
+    min_freq = 1.0
+    max_freq = min(float(freqs[-1]), 22000.0)
+    visible = (freqs >= min_freq) & (freqs <= max_freq)
 
-    f_open, open_db = simplify_curve(freqs[visible], curves["open_db"][visible])
-    f_pnc, pnc_db = simplify_curve(freqs[visible], curves["pnc_db"][visible])
-    f_tnc, tnc_db = simplify_curve(freqs[visible], curves["tnc_db"][visible])
-    f_processed, processed_db = simplify_curve(freqs[visible], curves["processed_db"][visible])
-    f_rebound, rebound_db = simplify_curve(
+    f_open, open_db = simplify_curve_log(freqs[visible], curves["open_db"][visible], min_hz=min_freq)
+    f_pnc, pnc_db = simplify_curve_log(freqs[visible], curves["pnc_db"][visible], min_hz=min_freq)
+    f_tnc, tnc_db = simplify_curve_log(freqs[visible], curves["tnc_db"][visible], min_hz=min_freq)
+    f_processed, processed_db = simplify_curve_log(freqs[visible], curves["processed_db"][visible], min_hz=min_freq)
+    f_rebound, rebound_db = simplify_curve_log(
         freqs[visible],
         np.maximum(curves["tnc_db"][visible] - curves["pnc_db"][visible] - margin_db, 0.0),
+        min_hz=min_freq,
     )
-    f_processed_rebound, processed_rebound_db = simplify_curve(
+    f_processed_rebound, processed_rebound_db = simplify_curve_log(
         freqs[visible],
         np.maximum(
             curves["processed_db"][visible] - curves["pnc_db"][visible] - margin_db,
             0.0,
         ),
+        min_hz=min_freq,
     )
 
     db_range = nice_range([open_db, pnc_db, tnc_db, processed_db])
     rebound_range = (0.0, max(1.0, float(np.max([np.max(rebound_db), np.max(processed_rebound_db)])) * 1.15))
-    x_range = (0.0, max_freq)
+    x_range = (min_freq, max_freq)
 
     width, height = 1240, 860
     margin_l, margin_r = 82, 36
@@ -515,17 +518,21 @@ def write_rebound_svg(
 
     def band_rect(box: Tuple[float, float, float, float]) -> str:
         x0, y0, w, h = box
-        bx = x0 + (low_hz - x_range[0]) / max(x_range[1] - x_range[0], EPS) * w
-        bw = (high_hz - low_hz) / max(x_range[1] - x_range[0], EPS) * w
+        low = max(low_hz, x_range[0])
+        high = min(high_hz, x_range[1])
+        if high <= low:
+            return ""
+        bx = x0 + (np.log10(low) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bx1 = x0 + (np.log10(high) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+        bw = bx1 - bx
         return f'<rect x="{bx:.2f}" y="{y0}" width="{bw:.2f}" height="{h}" fill="#f6c453" opacity="0.18" />'
 
     def axes(box: Tuple[float, float, float, float], y_label: str) -> str:
         x0, y0, w, h = box
-        tick_values = np.linspace(0, max_freq, 6)
         ticks = []
-        for tick in tick_values:
-            x = x0 + (tick / max_freq) * w if max_freq else x0
-            label = f"{tick:.0f}"
+        for tick in log_ticks(x_range[0], x_range[1]):
+            x = x0 + (np.log10(tick) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+            label = f"{tick / 1000:g}k" if tick >= 1000 else f"{tick:g}"
             ticks.append(
                 f'<line x1="{x:.2f}" y1="{y0+h}" x2="{x:.2f}" y2="{y0+h+6}" stroke="#6b7280" />'
                 f'<text x="{x:.2f}" y="{y0+h+24}" text-anchor="middle">{label}</text>'
@@ -538,7 +545,7 @@ def write_rebound_svg(
         )
 
     def line(freq: np.ndarray, values: np.ndarray, y_range, box, color: str, width_px: float = 2.0) -> str:
-        points = svg_polyline(freq, values, x_range, y_range, box)
+        points = svg_polyline(freq, values, x_range, y_range, box, x_scale="log")
         return f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="{width_px}" />'
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
@@ -562,7 +569,7 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 <circle cx="840" cy="434" r="5" fill="#2563eb" /><text x="852" y="439">PNC</text>
 <circle cx="910" cy="434" r="5" fill="#d12f2f" /><text x="922" y="439">TNC</text>
 <circle cx="982" cy="434" r="5" fill="#111827" /><text x="994" y="439">Processed TNC</text>
-<text x="82" y="462">Frequency (Hz)</text>
+<text x="82" y="462">Frequency (Hz, log scale)</text>
 <text class="section" x="82" y="496">Rebound above PNC + margin</text>
 {axes(rebound_box, "Rebound dB")}
 {band_rect(rebound_box)}
@@ -570,7 +577,7 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 {line(f_processed_rebound, processed_rebound_db, rebound_range, rebound_box, "#111827", 2.4)}
 <circle cx="880" cy="778" r="5" fill="#d12f2f" /><text x="892" y="783">Original rebound</text>
 <circle cx="1034" cy="778" r="5" fill="#111827" /><text x="1046" y="783">After limiting</text>
-<text x="82" y="778">Frequency (Hz)</text>
+<text x="82" y="778">Frequency (Hz, log scale)</text>
 </svg>
 """
     path.write_text(svg, encoding="utf-8")

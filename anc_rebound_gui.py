@@ -50,7 +50,7 @@ from anc_slope_flattener import (
     write_report_html as write_slope_report_html,
     write_svg as write_slope_svg,
 )
-from audio_band_limiter import read_wav, simplify_curve, spectrum_curve, write_wav
+from audio_band_limiter import read_wav, simplify_curve_log, spectrum_curve, write_wav
 
 
 APP_TITLE = "ANC 反弹分析与控制工具"
@@ -594,8 +594,8 @@ class AncReboundGui(tk.Tk):
 
         chart = {
             "type": "frequency",
-            "x": curves["freq_hz"][curves["freq_hz"] <= min(max(end_hz * 2.0, end_hz + 100, 200), curves["freq_hz"][-1])],
-            "x_range": (1.0, max(end_hz * 2.0, end_hz + 100, 200)),
+            "x": None,
+            "x_range": (1.0, min(float(curves["freq_hz"][-1]), 22000.0)),
             "x_scale": "log",
             "x_label": "频率 (Hz，对数坐标)",
             "y_label": "ANC 显示值 (dB，降噪为负)",
@@ -604,11 +604,14 @@ class AncReboundGui(tk.Tk):
             "series": [],
             "title": "ANC 降噪量斜率",
         }
-        visible = curves["freq_hz"] <= chart["x"][-1]
+        visible = (curves["freq_hz"] >= chart["x_range"][0]) & (curves["freq_hz"] <= chart["x_range"][1])
+        chart["x"], original_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["original_anc_db"][visible])
+        _, target_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["target_anc_db"][visible])
+        _, modified_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["modified_anc_db"][visible])
         chart["series"] = [
-            ("原始 ANC", -curves["original_anc_db"][visible], "#d12f2f"),
-            ("目标 ANC", -curves["target_anc_db"][visible], "#2563eb"),
-            ("修改后 ANC", -curves["modified_anc_db"][visible], "#111827"),
+            ("原始 ANC", original_anc, "#d12f2f"),
+            ("目标 ANC", target_anc, "#2563eb"),
+            ("修改后 ANC", modified_anc, "#111827"),
         ]
         freqs = curves["freq_hz"]
         slope_rows = [
@@ -637,22 +640,26 @@ class AncReboundGui(tk.Tk):
 
     def make_frequency_chart(self, curves: dict, low_hz: float, high_hz: float) -> dict:
         freqs = curves["freq_hz"]
-        max_freq = min(max(high_hz * 2.5, high_hz + 200, 250), float(freqs[-1]))
-        mask = freqs <= max_freq
+        max_freq = min(float(freqs[-1]), 22000.0)
+        mask = (freqs >= 1.0) & (freqs <= max_freq)
+        x_values, open_db = simplify_curve_log(freqs[mask], curves["open_db"][mask])
+        _, pnc_db = simplify_curve_log(freqs[mask], curves["pnc_db"][mask])
+        _, tnc_db = simplify_curve_log(freqs[mask], curves["tnc_db"][mask])
+        _, processed_db = simplify_curve_log(freqs[mask], curves["processed_db"][mask])
         return {
             "type": "frequency",
-            "x": freqs[mask],
-            "x_range": (1.0, max(high_hz * 2.5, high_hz + 200, 250)),
+            "x": x_values,
+            "x_range": (1.0, max_freq),
             "x_scale": "log",
             "x_label": "频率 (Hz，对数坐标)",
             "y_label": "幅度 (dB)",
             "description": "可视化对象：OpenEar、PNC、原始TNC、处理后TNC 的频谱幅度曲线。",
             "band": (low_hz, high_hz),
             "series": [
-                ("OpenEar", curves["open_db"][mask], "#6b7280"),
-                ("PNC", curves["pnc_db"][mask], "#2563eb"),
-                ("TNC", curves["tnc_db"][mask], "#d12f2f"),
-                ("处理后 TNC", curves["processed_db"][mask], "#111827"),
+                ("OpenEar", open_db, "#6b7280"),
+                ("PNC", pnc_db, "#2563eb"),
+                ("TNC", tnc_db, "#d12f2f"),
+                ("处理后 TNC", processed_db, "#111827"),
             ],
             "title": "频谱概览",
         }
@@ -668,11 +675,11 @@ class AncReboundGui(tk.Tk):
         freqs, pnc_db, _ = spectrum_curve(pnc_samples[:min_len], sample_rate)
         _, tnc_db, _ = spectrum_curve(tnc_samples[:min_len], sample_rate)
         _, controlled_db, _ = spectrum_curve(controlled_samples[:min_len], sample_rate)
-        max_freq = float(freqs[-1])
-        visible = freqs > 0
-        x_values, pnc_values = simplify_curve(freqs[visible], pnc_db[visible])
-        _, tnc_values = simplify_curve(freqs[visible], tnc_db[visible])
-        _, controlled_values = simplify_curve(freqs[visible], controlled_db[visible])
+        max_freq = min(float(freqs[-1]), 22000.0)
+        visible = (freqs >= 1.0) & (freqs <= max_freq)
+        x_values, pnc_values = simplify_curve_log(freqs[visible], pnc_db[visible])
+        _, tnc_values = simplify_curve_log(freqs[visible], tnc_db[visible])
+        _, controlled_values = simplify_curve_log(freqs[visible], controlled_db[visible])
         return {
             "type": "frequency",
             "x": x_values,
