@@ -84,6 +84,8 @@ class AncReboundGui(tk.Tk):
         self.slope_mode_var = tk.StringVar(value="平缓")
         self.slope_start_reduction_var = tk.StringVar(value="0")
         self.slope_end_reduction_var = tk.StringVar(value="0")
+        self.slope_start_transition_var = tk.StringVar(value="0")
+        self.slope_end_transition_var = tk.StringVar(value="0")
         self.status_var = tk.StringVar(value="就绪")
         self.last_output_dir: Path | None = None
 
@@ -195,24 +197,27 @@ class AncReboundGui(tk.Tk):
         self._entry(slope, 1, 2, "替代长度 Hz", self.slope_length_var)
         self._entry(slope, 2, 0, "起点压浅 dB", self.slope_start_reduction_var)
         self._entry(slope, 2, 2, "终点压浅 dB", self.slope_end_reduction_var)
-        ttk.Label(slope, text="平滑模式").grid(row=3, column=0, sticky="w", pady=4, padx=(0, 6))
+        self._entry(slope, 3, 0, "起点过渡 Hz", self.slope_start_transition_var)
+        self._entry(slope, 3, 2, "终点过渡 Hz", self.slope_end_transition_var)
+        ttk.Label(slope, text="平滑模式").grid(row=4, column=0, sticky="w", pady=4, padx=(0, 6))
         ttk.Combobox(
             slope,
             textvariable=self.slope_mode_var,
             values=("平缓", "线性"),
             width=9,
             state="readonly",
-        ).grid(row=3, column=1, sticky="ew", pady=4)
+        ).grid(row=4, column=1, sticky="ew", pady=4)
         ttk.Button(slope, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).grid(
-            row=4, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+            row=5, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
         self._help_table(
             slope,
-            5,
+            6,
             [
                 ("起始频率 Hz", "要替换的 ANC 降噪量曲线片段起点。计算仍用 ANC=PNC(dB)-TNC(dB)，界面显示为负值降噪。"),
                 ("替代长度 Hz", "从起始频率往后的替代宽度。例如起始 30、长度 50 表示替换 30-80 Hz。"),
                 ("起点/终点压浅 dB", "先把端点 ANC 深度减少指定 dB，再做平滑。起点填 3 表示起点先少 3 dB 降噪深度，会改变整体斜率。"),
+                ("起点/终点过渡 Hz", "在主替代段前后增加平滑接入/接出宽度，避免端点压浅造成突变。0 表示不加额外过渡。"),
                 ("平滑模式", "平缓：首尾更顺，默认建议；线性：端点之间直线过渡。"),
                 ("输出 WAV", "PNC 不动，通过缩放 TNC 频谱幅度生成新的 TNC，用来让 ANC 曲线在该段更平缓。"),
                 ("斜率指标", "重点看最大局部斜率、P95 局部斜率、有效宽度和集中度；平均斜率受端点约束，不是主要判断。"),
@@ -529,6 +534,8 @@ class AncReboundGui(tk.Tk):
         length_hz = float(self.slope_length_var.get())
         start_depth_reduction_db = float(self.slope_start_reduction_var.get())
         end_depth_reduction_db = float(self.slope_end_reduction_var.get())
+        start_transition_hz = float(self.slope_start_transition_var.get())
+        end_transition_hz = float(self.slope_end_transition_var.get())
         mode_label = self.slope_mode_var.get()
         mode = self.slope_mode_value()
         pnc = read_wav(Path(self.pnc_var.get()))
@@ -551,6 +558,8 @@ class AncReboundGui(tk.Tk):
             18.0,
             start_depth_reduction_db,
             end_depth_reduction_db,
+            start_transition_hz,
+            end_transition_hz,
         )
         end_hz = start_hz + length_hz
         output_wav = out_dir / "tnc_anc_slope_flattened.wav"
@@ -558,7 +567,7 @@ class AncReboundGui(tk.Tk):
         svg_path = out_dir / "anc_slope_curve.svg"
         report_path = out_dir / "anc_slope_report.html"
         write_wav(output_wav, modified_tnc, tnc.sample_rate)
-        write_slope_curve_csv(csv_path, curves, start_hz, end_hz)
+        write_slope_curve_csv(csv_path, curves, start_hz, end_hz, start_transition_hz, end_transition_hz)
         write_slope_svg(svg_path, curves, start_hz, end_hz, "ANC slope flattening")
         write_slope_report_html(
             report_path,
@@ -572,6 +581,8 @@ class AncReboundGui(tk.Tk):
             mode,
             start_depth_reduction_db,
             end_depth_reduction_db,
+            start_transition_hz,
+            end_transition_hz,
         )
 
         chart = {
@@ -581,7 +592,7 @@ class AncReboundGui(tk.Tk):
             "x_scale": "log",
             "x_label": "频率 (Hz，对数坐标)",
             "y_label": "ANC 显示值 (dB，降噪为负)",
-            "description": f"可视化对象：ANC降噪量曲线。内部仍按 PNC(dB)-TNC(dB) 计算；界面显示为相反数。端点压浅：起点 {start_depth_reduction_db:g} dB，终点 {end_depth_reduction_db:g} dB。",
+            "description": f"可视化对象：ANC降噪量曲线。界面显示为负值降噪。端点压浅：起点 {start_depth_reduction_db:g} dB，终点 {end_depth_reduction_db:g} dB；过渡：起点 {start_transition_hz:g} Hz，终点 {end_transition_hz:g} Hz。",
             "band": (start_hz, end_hz),
             "series": [],
             "title": "ANC 降噪量斜率",

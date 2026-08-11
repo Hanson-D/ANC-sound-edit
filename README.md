@@ -202,6 +202,8 @@ python3 anc_slope_flattener.py \
   --length-hz 50 \
   --start-depth-reduction-db 3 \
   --end-depth-reduction-db 0 \
+  --start-transition-hz 10 \
+  --end-transition-hz 10 \
   --mode smoothstep \
   --output-dir out/anc_slope
 ```
@@ -211,6 +213,9 @@ The endpoint reduction options first make the selected endpoint ANC depth
 shallower, then smooth between the adjusted endpoints. For example,
 `--start-depth-reduction-db 3` reduces the start point's ANC depth by 3 dB
 before generating the replacement curve.
+`--start-transition-hz` and `--end-transition-hz` add smooth connection bands
+before and after the replaced segment, avoiding abrupt jumps when endpoint
+depth reduction is used.
 
 Main outputs:
 

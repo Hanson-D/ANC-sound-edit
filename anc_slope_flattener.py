@@ -57,6 +57,8 @@ def make_replacement_curve(
     mode: str,
     start_depth_reduction_db: float,
     end_depth_reduction_db: float,
+    start_transition_hz: float,
+    end_transition_hz: float,
 ) -> Tuple[np.ndarray, np.ndarray]:
     if start_hz < freqs[0] or end_hz > freqs[-1]:
         raise ValueError(f"selected range must be inside {freqs[0]:g}-{freqs[-1]:g} Hz")
@@ -66,8 +68,11 @@ def make_replacement_curve(
     start_value = float(np.interp(start_hz, freqs, anc_db)) - start_depth_reduction_db
     end_value = float(np.interp(end_hz, freqs, anc_db)) - end_depth_reduction_db
     target = anc_db.copy()
-    band = (freqs >= start_hz) & (freqs <= end_hz)
-    x = (freqs[band] - start_hz) / max(end_hz - start_hz, EPS)
+    main_band = (freqs >= start_hz) & (freqs <= end_hz)
+    affected_start_hz = max(float(freqs[0]), start_hz - max(start_transition_hz, 0.0))
+    affected_end_hz = min(float(freqs[-1]), end_hz + max(end_transition_hz, 0.0))
+    affected_band = (freqs >= affected_start_hz) & (freqs <= affected_end_hz)
+    x = (freqs[main_band] - start_hz) / max(end_hz - start_hz, EPS)
 
     if mode == "linear":
         weight = x
@@ -76,8 +81,21 @@ def make_replacement_curve(
     else:
         raise ValueError("--mode must be smoothstep or linear")
 
-    target[band] = start_value + (end_value - start_value) * weight
-    return target, band
+    if start_transition_hz > 0:
+        pre_band = (freqs >= affected_start_hz) & (freqs < start_hz)
+        pre_x = (freqs[pre_band] - affected_start_hz) / max(start_hz - affected_start_hz, EPS)
+        pre_weight = smoothstep(pre_x)
+        target[pre_band] = anc_db[pre_band] + (start_value - anc_db[pre_band]) * pre_weight
+
+    target[main_band] = start_value + (end_value - start_value) * weight
+
+    if end_transition_hz > 0:
+        post_band = (freqs > end_hz) & (freqs <= affected_end_hz)
+        post_x = (freqs[post_band] - end_hz) / max(affected_end_hz - end_hz, EPS)
+        post_weight = smoothstep(post_x)
+        target[post_band] = end_value + (anc_db[post_band] - end_value) * post_weight
+
+    return target, affected_band
 
 
 def mean_stft_magnitude_db(samples: np.ndarray, sample_rate: int, frame_size: int, hop_size: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -103,6 +121,8 @@ def flatten_anc_slope(
     max_cut_db: float,
     start_depth_reduction_db: float = 0.0,
     end_depth_reduction_db: float = 0.0,
+    start_transition_hz: float = 0.0,
+    end_transition_hz: float = 0.0,
 ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
     end_hz = start_hz + length_hz
     freqs, pnc_db = mean_stft_magnitude_db(pnc_samples, sample_rate, frame_size, hop_size)
@@ -116,6 +136,8 @@ def flatten_anc_slope(
         mode,
         start_depth_reduction_db,
         end_depth_reduction_db,
+        start_transition_hz,
+        end_transition_hz,
     )
     target_tnc_db = pnc_db - target_anc_db
     gain_db = target_tnc_db - tnc_db
@@ -195,10 +217,19 @@ def slope_shape_metrics(
     }
 
 
-def write_curve_csv(path: Path, curves: Dict[str, np.ndarray], start_hz: float, end_hz: float) -> None:
+def write_curve_csv(
+    path: Path,
+    curves: Dict[str, np.ndarray],
+    start_hz: float,
+    end_hz: float,
+    start_transition_hz: float = 0.0,
+    end_transition_hz: float = 0.0,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
-    band = (freqs >= start_hz) & (freqs <= end_hz)
+    export_start = max(float(freqs[0]), start_hz - max(start_transition_hz, 0.0))
+    export_end = min(float(freqs[-1]), end_hz + max(end_transition_hz, 0.0))
+    band = (freqs >= export_start) & (freqs <= export_end)
     fieldnames = [
         "freq_hz",
         "pnc_db",
@@ -320,6 +351,8 @@ def write_report_html(
     mode: str,
     start_depth_reduction_db: float,
     end_depth_reduction_db: float,
+    start_transition_hz: float,
+    end_transition_hz: float,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
@@ -362,6 +395,7 @@ code {{ background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }}
 <h1>ANC Slope Flattening Report</h1>
 <p>ANC definition: <code>PNC_dB - TNC_dB</code>. Replacement range: <strong>{start_hz:g}-{end_hz:g} Hz</strong>. Mode: <strong>{html.escape(mode)}</strong>.</p>
 <p>Endpoint depth reduction: start <strong>{start_depth_reduction_db:g} dB</strong>, end <strong>{end_depth_reduction_db:g} dB</strong>. A positive value makes the ANC depth shallower at that endpoint before smoothing.</p>
+<p>Transition width: start side <strong>{start_transition_hz:g} Hz</strong>, end side <strong>{end_transition_hz:g} Hz</strong>. These transition bands smooth the connection back to the original ANC curve.</p>
 <p>Because start and end values are fixed, average slope is mostly a reference. The main steepness checks are max local slope, p95 local slope, effective transition width, and concentration ratio.</p>
 <h2>Files</h2>
 <ul>
@@ -395,6 +429,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mode", choices=["smoothstep", "linear"], default="smoothstep")
     parser.add_argument("--start-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the start point before smoothing")
     parser.add_argument("--end-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the end point before smoothing")
+    parser.add_argument("--start-transition-hz", type=float, default=0.0, help="smooth-in width before the start point")
+    parser.add_argument("--end-transition-hz", type=float, default=0.0, help="smooth-out width after the end point")
     parser.add_argument("--output-dir", type=Path, default=Path("out/anc_slope"))
     parser.add_argument("--frame-size", type=int, default=8192)
     parser.add_argument("--hop-size", type=int, default=2048)
@@ -409,6 +445,8 @@ def main() -> None:
         raise ValueError("--start-hz must be non-negative and --length-hz must be positive")
     if args.frame_size <= 0 or args.hop_size <= 0:
         raise ValueError("--frame-size and --hop-size must be positive")
+    if args.start_transition_hz < 0 or args.end_transition_hz < 0:
+        raise ValueError("--start-transition-hz and --end-transition-hz must be non-negative")
 
     pnc = read_wav(args.pnc)
     tnc = read_wav(args.tnc)
@@ -431,6 +469,8 @@ def main() -> None:
         args.max_cut_db,
         args.start_depth_reduction_db,
         args.end_depth_reduction_db,
+        args.start_transition_hz,
+        args.end_transition_hz,
     )
 
     output_wav = args.output_dir / "tnc_anc_slope_flattened.wav"
@@ -438,7 +478,7 @@ def main() -> None:
     svg_path = args.output_dir / "anc_slope_curve.svg"
     report_path = args.output_dir / "anc_slope_report.html"
     write_wav(output_wav, modified_tnc, tnc.sample_rate)
-    write_curve_csv(csv_path, curves, args.start_hz, end_hz)
+    write_curve_csv(csv_path, curves, args.start_hz, end_hz, args.start_transition_hz, args.end_transition_hz)
     write_svg(svg_path, curves, args.start_hz, end_hz, "ANC slope flattening")
     write_report_html(
         report_path,
@@ -452,6 +492,8 @@ def main() -> None:
         args.mode,
         args.start_depth_reduction_db,
         args.end_depth_reduction_db,
+        args.start_transition_hz,
+        args.end_transition_hz,
     )
 
     freqs = curves["freq_hz"]
