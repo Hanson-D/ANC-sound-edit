@@ -31,6 +31,7 @@ from audio_band_limiter import (
     spectrum_curve,
     stft,
     svg_polyline,
+    unique_output_path,
     write_wav,
     log_ticks,
 )
@@ -521,10 +522,10 @@ def main() -> None:
         args.end_transition_hz,
     )
 
-    output_wav = args.output_dir / "tnc_anc_slope_flattened.wav"
-    csv_path = args.output_dir / "anc_slope_curve.csv"
-    svg_path = args.output_dir / "anc_slope_curve.svg"
-    report_path = args.output_dir / "anc_slope_report.html"
+    output_wav = unique_output_path(args.output_dir / "tnc_anc_slope_flattened.wav")
+    csv_path = unique_output_path(args.output_dir / "anc_slope_curve.csv")
+    svg_path = unique_output_path(args.output_dir / "anc_slope_curve.svg")
+    report_path = unique_output_path(args.output_dir / "anc_slope_report.html")
     write_wav(output_wav, modified_tnc, tnc.sample_rate)
     write_curve_csv(csv_path, curves, args.start_hz, end_hz, args.start_transition_hz, args.end_transition_hz)
     write_svg(svg_path, curves, args.start_hz, end_hz, "ANC slope flattening")

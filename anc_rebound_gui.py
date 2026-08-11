@@ -50,7 +50,7 @@ from anc_slope_flattener import (
     write_report_html as write_slope_report_html,
     write_svg as write_slope_svg,
 )
-from audio_band_limiter import read_wav, simplify_curve_log, spectrum_curve, write_wav
+from audio_band_limiter import read_wav, simplify_curve_log, spectrum_curve, unique_output_path, write_wav
 
 
 APP_TITLE = "ANC 反弹分析与控制工具"
@@ -398,7 +398,7 @@ class AncReboundGui(tk.Tk):
                 8192,
                 2048,
             )
-            wav_path = out_dir / f"tnc_rebound_limited_{label}.wav"
+            wav_path = unique_output_path(out_dir / f"tnc_rebound_limited_{label}.wav")
             write_wav(wav_path, processed, tnc.sample_rate)
             output_files[f"processed_tnc_{label}"] = wav_path
 
@@ -419,22 +419,26 @@ class AncReboundGui(tk.Tk):
                 params["merge_gap_ms"],
             )
             time_metrics.extend(tm)
-            write_band_csv(out_dir / f"band_detail_{label}.csv", curves, params["low_hz"], params["high_hz"], margin)
-            write_time_events_csv(out_dir / f"time_rebound_events_{label}.csv", events)
-            svg_path = out_dir / f"curves_{label}.svg"
+            band_csv_path = unique_output_path(out_dir / f"band_detail_{label}.csv")
+            events_csv_path = unique_output_path(out_dir / f"time_rebound_events_{label}.csv")
+            write_band_csv(band_csv_path, curves, params["low_hz"], params["high_hz"], margin)
+            write_time_events_csv(events_csv_path, events)
+            output_files[f"band_detail_{label}"] = band_csv_path
+            output_files[f"time_events_{label}"] = events_csv_path
+            svg_path = unique_output_path(out_dir / f"curves_{label}.svg")
             write_rebound_svg(svg_path, curves, params["low_hz"], params["high_hz"], margin, f"ANC rebound analysis ({label})")
             if index == 0:
                 first_svg = svg_path
                 first_curves = curves
 
-        metrics_path = out_dir / "rebound_metrics.csv"
-        time_metrics_path = out_dir / "time_rebound_metrics.csv"
+        metrics_path = unique_output_path(out_dir / "rebound_metrics.csv")
+        time_metrics_path = unique_output_path(out_dir / "time_rebound_metrics.csv")
         write_metrics_csv(metrics_path, freq_metrics)
         write_time_metrics_csv(time_metrics_path, time_metrics)
         output_files["metrics_csv"] = metrics_path
         output_files["time_metrics_csv"] = time_metrics_path
         output_files["primary_svg"] = first_svg
-        report_path = out_dir / "analysis_report.html"
+        report_path = unique_output_path(out_dir / "analysis_report.html")
         write_analysis_report_html(report_path, freq_metrics, time_metrics, first_svg, output_files, params["low_hz"], params["high_hz"])
         output_files["html_report"] = report_path
 
@@ -471,12 +475,12 @@ class AncReboundGui(tk.Tk):
             max_attenuation_db,
             safety_db,
         )
-        controlled_path = out_dir / "tnc_time_rebound_controlled.wav"
+        controlled_path = unique_output_path(out_dir / "tnc_time_rebound_controlled.wav")
         write_wav(controlled_path, controlled, tnc.sample_rate)
 
         controlled_band = band_limit_samples(controlled, tnc.sample_rate, params["low_hz"], params["high_hz"])
         _, _, controlled_rms_db = frame_rms_db(controlled_band, tnc.sample_rate, params["window_ms"], params["hop_ms"])
-        trace_path = out_dir / "time_control_trace.csv"
+        trace_path = unique_output_path(out_dir / "time_control_trace.csv")
         write_trace_csv(trace_path, frame_times_s, pnc_rms_db, tnc_rms_db, controlled_rms_db, desired_gain_db, applied_gain_db, margin)
 
         time_metrics, events = detect_time_rebound_events(
@@ -492,14 +496,14 @@ class AncReboundGui(tk.Tk):
             params["min_event_ms"],
             params["merge_gap_ms"],
         )
-        metrics_path = out_dir / "time_rebound_metrics.csv"
-        events_path = out_dir / "time_rebound_events.csv"
+        metrics_path = unique_output_path(out_dir / "time_rebound_metrics.csv")
+        events_path = unique_output_path(out_dir / "time_rebound_events.csv")
         write_time_metrics_csv(metrics_path, time_metrics)
         write_time_events_csv(events_path, events)
 
-        svg_path = out_dir / "time_control.svg"
+        svg_path = unique_output_path(out_dir / "time_control.svg")
         write_control_svg(svg_path, frame_times_s, pnc_rms_db, tnc_rms_db, controlled_rms_db, applied_gain_db, margin, "ANC time-domain rebound control")
-        report_path = out_dir / "time_control_report.html"
+        report_path = unique_output_path(out_dir / "time_control_report.html")
         files = {
             "pnc": Path(self.pnc_var.get()),
             "tnc": Path(self.tnc_var.get()),
@@ -569,10 +573,10 @@ class AncReboundGui(tk.Tk):
             end_transition_hz,
         )
         end_hz = start_hz + length_hz
-        output_wav = out_dir / "tnc_anc_slope_flattened.wav"
-        csv_path = out_dir / "anc_slope_curve.csv"
-        svg_path = out_dir / "anc_slope_curve.svg"
-        report_path = out_dir / "anc_slope_report.html"
+        output_wav = unique_output_path(out_dir / "tnc_anc_slope_flattened.wav")
+        csv_path = unique_output_path(out_dir / "anc_slope_curve.csv")
+        svg_path = unique_output_path(out_dir / "anc_slope_curve.svg")
+        report_path = unique_output_path(out_dir / "anc_slope_report.html")
         write_wav(output_wav, modified_tnc, tnc.sample_rate)
         write_slope_curve_csv(csv_path, curves, start_hz, end_hz, start_transition_hz, end_transition_hz)
         write_slope_svg(svg_path, curves, start_hz, end_hz, "ANC slope flattening")

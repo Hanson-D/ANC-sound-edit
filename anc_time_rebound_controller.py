@@ -34,7 +34,7 @@ from anc_rebound_analyzer import (
     write_time_events_csv,
     write_time_metrics_csv,
 )
-from audio_band_limiter import EPS, nice_range, read_wav, svg_polyline, write_wav
+from audio_band_limiter import EPS, nice_range, read_wav, svg_polyline, unique_output_path, write_wav
 
 
 def validate_pair(pnc, tnc) -> None:
@@ -364,12 +364,12 @@ def main() -> None:
         args.safety_db,
     )
 
-    controlled_path = args.output_dir / "tnc_time_rebound_controlled.wav"
+    controlled_path = unique_output_path(args.output_dir / "tnc_time_rebound_controlled.wav")
     write_wav(controlled_path, controlled, tnc.sample_rate)
 
     controlled_band = band_limit_samples(controlled, tnc.sample_rate, args.low_hz, args.high_hz)
     _, _, controlled_rms_db = frame_rms_db(controlled_band, tnc.sample_rate, args.time_window_ms, args.time_hop_ms)
-    trace_path = args.output_dir / "time_control_trace.csv"
+    trace_path = unique_output_path(args.output_dir / "time_control_trace.csv")
     write_trace_csv(
         trace_path,
         frame_times_s,
@@ -394,12 +394,12 @@ def main() -> None:
         args.min_event_ms,
         args.merge_gap_ms,
     )
-    metrics_path = args.output_dir / "time_rebound_metrics.csv"
-    events_path = args.output_dir / "time_rebound_events.csv"
+    metrics_path = unique_output_path(args.output_dir / "time_rebound_metrics.csv")
+    events_path = unique_output_path(args.output_dir / "time_rebound_events.csv")
     write_time_metrics_csv(metrics_path, time_metrics)
     write_time_events_csv(events_path, time_events)
 
-    svg_path = args.output_dir / "time_control.svg"
+    svg_path = unique_output_path(args.output_dir / "time_control.svg")
     write_control_svg(
         svg_path,
         frame_times_s,
@@ -420,7 +420,7 @@ def main() -> None:
         "events_csv": events_path,
         "svg": svg_path,
     }
-    report_path = args.output_dir / "time_control_report.html"
+    report_path = unique_output_path(args.output_dir / "time_control_report.html")
     write_report_html(report_path, svg_path, time_metrics, files, args.low_hz, args.high_hz, args.margin_db)
 
     original = summarize_metrics(time_metrics, "original_tnc")

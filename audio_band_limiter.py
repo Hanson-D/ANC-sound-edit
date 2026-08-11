@@ -75,6 +75,16 @@ def resolve_input_path(path: Path) -> Path:
     return path
 
 
+def unique_output_path(path: Path) -> Path:
+    if not path.exists():
+        return path
+    for index in range(1, 10000):
+        candidate = path.with_name(f"{path.stem}_{index:03d}{path.suffix}")
+        if not candidate.exists():
+            return candidate
+    raise FileExistsError(f"could not find available filename for {path}")
+
+
 def read_wav_chunks(path: Path) -> Tuple[int, int, int, int, bytes]:
     with path.open("rb") as f:
         riff = f.read(12)
@@ -458,9 +468,11 @@ def main() -> None:
         args.frame_size,
         args.hop_size,
     )
-    write_wav(args.output_wav, processed, audio_a.sample_rate)
+    output_wav = unique_output_path(args.output_wav)
+    plot_svg = unique_output_path(args.plot_svg)
+    write_wav(output_wav, processed, audio_a.sample_rate)
     write_spectrum_svg(
-        args.plot_svg,
+        plot_svg,
         audio_a,
         audio_b,
         processed,
@@ -469,8 +481,8 @@ def main() -> None:
         "A limited to B in selected band",
     )
 
-    print(f"Wrote processed WAV: {args.output_wav}")
-    print(f"Wrote frequency/phase plot: {args.plot_svg}")
+    print(f"Wrote processed WAV: {output_wav}")
+    print(f"Wrote frequency/phase plot: {plot_svg}")
     print(f"Reduced STFT bins: {changed_bins}")
 
 

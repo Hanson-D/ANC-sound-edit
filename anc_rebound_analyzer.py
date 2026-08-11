@@ -33,6 +33,7 @@ from audio_band_limiter import (
     spectrum_curve,
     stft,
     svg_polyline,
+    unique_output_path,
     write_wav,
     log_ticks,
 )
@@ -780,7 +781,7 @@ def main() -> None:
             args.frame_size,
             args.hop_size,
         )
-        wav_path = args.output_dir / f"tnc_rebound_limited_{label}.wav"
+        wav_path = unique_output_path(args.output_dir / f"tnc_rebound_limited_{label}.wav")
         write_wav(wav_path, processed, tnc.sample_rate)
         output_files[f"processed_tnc_{label}"] = wav_path
 
@@ -801,9 +802,13 @@ def main() -> None:
             args.merge_gap_ms,
         )
         time_metrics.extend(margin_time_metrics)
-        write_band_csv(args.output_dir / f"band_detail_{label}.csv", curves, args.low_hz, args.high_hz, margin_db)
-        write_time_events_csv(args.output_dir / f"time_rebound_events_{label}.csv", time_events)
-        svg_path = args.output_dir / f"curves_{label}.svg"
+        band_csv_path = unique_output_path(args.output_dir / f"band_detail_{label}.csv")
+        events_csv_path = unique_output_path(args.output_dir / f"time_rebound_events_{label}.csv")
+        write_band_csv(band_csv_path, curves, args.low_hz, args.high_hz, margin_db)
+        write_time_events_csv(events_csv_path, time_events)
+        output_files[f"band_detail_{label}"] = band_csv_path
+        output_files[f"time_events_{label}"] = events_csv_path
+        svg_path = unique_output_path(args.output_dir / f"curves_{label}.svg")
         write_rebound_svg(
             svg_path,
             curves,
@@ -817,16 +822,16 @@ def main() -> None:
             first_curves = curves
             first_svg = svg_path
 
-    metrics_path = args.output_dir / "rebound_metrics.csv"
+    metrics_path = unique_output_path(args.output_dir / "rebound_metrics.csv")
     write_metrics_csv(metrics_path, metrics)
-    time_metrics_path = args.output_dir / "time_rebound_metrics.csv"
+    time_metrics_path = unique_output_path(args.output_dir / "time_rebound_metrics.csv")
     write_time_metrics_csv(time_metrics_path, time_metrics)
     output_files["metrics_csv"] = metrics_path
     output_files["time_metrics_csv"] = time_metrics_path
     if first_svg is not None:
         output_files["primary_svg"] = first_svg
     if first_curves is not None:
-        report_path = args.output_dir / "analysis_report.html"
+        report_path = unique_output_path(args.output_dir / "analysis_report.html")
         write_report_html(report_path, metrics, time_metrics, first_svg, output_files, args.low_hz, args.high_hz)
         output_files["html_report"] = report_path
 
