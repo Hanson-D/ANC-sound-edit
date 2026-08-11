@@ -10,8 +10,10 @@ short-time FFT bin in A is reduced to B's magnitude whenever A is higher.
 from __future__ import annotations
 
 import argparse
+import glob
 import html
 import math
+import struct
 import wave
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,6 +23,11 @@ import numpy as np
 
 
 EPS = 1e-12
+WAVE_FORMAT_PCM = 0x0001
+WAVE_FORMAT_IEEE_FLOAT = 0x0003
+WAVE_FORMAT_EXTENSIBLE = 0xFFFE
+KSDATAFORMAT_SUBTYPE_PCM = bytes.fromhex("0100000000001000800000aa00389b71")
+KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = bytes.fromhex("0300000000001000800000aa00389b71")
 
 
 @dataclass(frozen=True)
@@ -30,27 +37,98 @@ class WavAudio:
 
 
 def read_wav(path: Path) -> WavAudio:
-    with wave.open(str(path), "rb") as wav:
-        channels = wav.getnchannels()
-        sample_width = wav.getsampwidth()
-        sample_rate = wav.getframerate()
-        frames = wav.getnframes()
-        raw = wav.readframes(frames)
+    resolved = resolve_input_path(path)
+    fmt, channels, sample_rate, bits_per_sample, raw = read_wav_chunks(resolved)
+    sample_width = (bits_per_sample + 7) // 8
 
-    if sample_width == 1:
+    if fmt == WAVE_FORMAT_PCM and sample_width == 1:
         data = np.frombuffer(raw, dtype=np.uint8).astype(np.float64)
         data = (data - 128.0) / 128.0
-    elif sample_width == 2:
+    elif fmt == WAVE_FORMAT_PCM and sample_width == 2:
         data = np.frombuffer(raw, dtype="<i2").astype(np.float64) / 32768.0
-    elif sample_width == 3:
+    elif fmt == WAVE_FORMAT_PCM and sample_width == 3:
         data = pcm24_to_float(raw)
-    elif sample_width == 4:
+    elif fmt == WAVE_FORMAT_PCM and sample_width == 4:
         data = np.frombuffer(raw, dtype="<i4").astype(np.float64) / 2147483648.0
+    elif fmt == WAVE_FORMAT_IEEE_FLOAT and sample_width == 4:
+        data = np.frombuffer(raw, dtype="<f4").astype(np.float64)
+    elif fmt == WAVE_FORMAT_IEEE_FLOAT and sample_width == 8:
+        data = np.frombuffer(raw, dtype="<f8").astype(np.float64)
     else:
-        raise ValueError(f"{path}: unsupported PCM sample width: {sample_width} bytes")
+        raise ValueError(
+            f"{resolved}: unsupported WAV encoding format={fmt}, bits_per_sample={bits_per_sample}. "
+            "Supported input: PCM 8/16/24/32-bit, IEEE float 32/64-bit, and WAVE_FORMAT_EXTENSIBLE with PCM/float subtype."
+        )
 
+    frame_values = (len(data) // channels) * channels
+    if frame_values != len(data):
+        data = data[:frame_values]
     samples = data.reshape(-1, channels)
     return WavAudio(samples=np.ascontiguousarray(samples), sample_rate=sample_rate)
+
+
+def resolve_input_path(path: Path) -> Path:
+    text = str(path)
+    matches = glob.glob(text)
+    if matches:
+        return Path(matches[0])
+    return path
+
+
+def read_wav_chunks(path: Path) -> Tuple[int, int, int, int, bytes]:
+    with path.open("rb") as f:
+        riff = f.read(12)
+        if len(riff) != 12 or riff[:4] != b"RIFF" or riff[8:12] != b"WAVE":
+            raise ValueError(f"{path}: not a RIFF/WAVE file")
+
+        fmt_info = None
+        data = None
+        while True:
+            header = f.read(8)
+            if not header:
+                break
+            if len(header) != 8:
+                raise ValueError(f"{path}: truncated WAV chunk header")
+            chunk_id, chunk_size = header[:4], struct.unpack("<I", header[4:])[0]
+            payload = f.read(chunk_size)
+            if len(payload) != chunk_size:
+                raise ValueError(f"{path}: truncated WAV chunk {chunk_id!r}")
+            if chunk_size % 2:
+                f.seek(1, 1)
+
+            if chunk_id == b"fmt ":
+                fmt_info = parse_fmt_chunk(path, payload)
+            elif chunk_id == b"data":
+                data = payload
+
+        if fmt_info is None:
+            raise ValueError(f"{path}: missing fmt chunk")
+        if data is None:
+            raise ValueError(f"{path}: missing data chunk")
+
+    fmt, channels, sample_rate, bits_per_sample = fmt_info
+    return fmt, channels, sample_rate, bits_per_sample, data
+
+
+def parse_fmt_chunk(path: Path, payload: bytes) -> Tuple[int, int, int, int]:
+    if len(payload) < 16:
+        raise ValueError(f"{path}: invalid fmt chunk")
+    fmt, channels, sample_rate, _byte_rate, block_align, bits_per_sample = struct.unpack("<HHIIHH", payload[:16])
+    if channels <= 0 or sample_rate <= 0 or block_align <= 0:
+        raise ValueError(f"{path}: invalid WAV fmt values")
+
+    if fmt == WAVE_FORMAT_EXTENSIBLE:
+        if len(payload) < 40:
+            raise ValueError(f"{path}: invalid WAVE_FORMAT_EXTENSIBLE fmt chunk")
+        subformat = payload[24:40]
+        if subformat == KSDATAFORMAT_SUBTYPE_PCM:
+            fmt = WAVE_FORMAT_PCM
+        elif subformat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT:
+            fmt = WAVE_FORMAT_IEEE_FLOAT
+        else:
+            raise ValueError(f"{path}: unsupported WAVE_FORMAT_EXTENSIBLE subtype {subformat.hex()}")
+
+    return fmt, channels, sample_rate, bits_per_sample
 
 
 def pcm24_to_float(raw: bytes) -> np.ndarray:

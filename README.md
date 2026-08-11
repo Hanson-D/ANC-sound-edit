@@ -43,9 +43,13 @@ python3 audio_band_limiter.py input_a.wav input_b.wav \
 Notes:
 
 - A and B must have the same sample rate and channel count.
-- WAV input should be PCM WAV. Output is 16-bit PCM WAV.
+- WAV input can be PCM WAV, IEEE float WAV, or common Windows
+  `WAVE_FORMAT_EXTENSIBLE` PCM/float WAV. Output is 16-bit PCM WAV.
 - `--frame-size` controls frequency resolution. Larger values give finer
   frequency bins but less time precision.
+- On Windows command line, wrap paths with spaces in quotes, for example
+  `"C:\Users\me\Desktop\PNC file.wav"`. The GUI file picker handles paths
+  directly.
 
 ## ANC Rebound Analyzer
 
