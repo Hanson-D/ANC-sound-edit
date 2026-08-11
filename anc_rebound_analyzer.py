@@ -336,7 +336,7 @@ def compute_metrics(
     mean_positive = (
         float(np.mean(positive_rebound_db[rebound_bins])) if np.any(rebound_bins) else 0.0
     )
-    area = float(np.trapz(positive_rebound_db, band_freqs)) if len(band_freqs) > 1 else 0.0
+    area = trapezoid_area(positive_rebound_db, band_freqs) if len(band_freqs) > 1 else 0.0
 
     return ReboundMetrics(
         margin_db=margin_db,
@@ -350,6 +350,14 @@ def compute_metrics(
         min_anc_contribution_db=float(np.min(anc_contribution_db)),
         changed_stft_bins=changed_stft_bins,
     )
+
+
+def trapezoid_area(values: np.ndarray, x_values: np.ndarray) -> float:
+    if len(values) < 2 or len(x_values) < 2:
+        return 0.0
+    widths = np.diff(x_values)
+    heights = (values[:-1] + values[1:]) * 0.5
+    return float(np.sum(widths * heights))
 
 
 def write_metrics_csv(path: Path, metrics: Iterable[ReboundMetrics]) -> None:
