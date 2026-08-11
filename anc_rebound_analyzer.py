@@ -506,16 +506,28 @@ def write_rebound_svg(
         ),
         min_hz=min_freq,
     )
+    f_anc, anc_depth_db = simplify_curve_log(
+        freqs[visible],
+        -(curves["pnc_db"][visible] - curves["tnc_db"][visible]),
+        min_hz=min_freq,
+    )
+    f_processed_anc, processed_anc_depth_db = simplify_curve_log(
+        freqs[visible],
+        -(curves["pnc_db"][visible] - curves["processed_db"][visible]),
+        min_hz=min_freq,
+    )
 
     db_range = nice_range([open_db, pnc_db, tnc_db, processed_db])
+    anc_range = nice_range([anc_depth_db, processed_anc_depth_db])
     rebound_range = (0.0, max(1.0, float(np.max([np.max(rebound_db), np.max(processed_rebound_db)])) * 1.15))
     x_range = (min_freq, max_freq)
 
-    width, height = 1240, 860
+    width, height = 1240, 1120
     margin_l, margin_r = 82, 36
     plot_w = width - margin_l - margin_r
-    spectrum_box = (margin_l, 96, plot_w, 300)
-    rebound_box = (margin_l, 510, plot_w, 230)
+    spectrum_box = (margin_l, 96, plot_w, 260)
+    anc_box = (margin_l, 466, plot_w, 220)
+    rebound_box = (margin_l, 796, plot_w, 200)
 
     def band_rect(box: Tuple[float, float, float, float]) -> str:
         x0, y0, w, h = box
@@ -566,19 +578,27 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 {line(f_pnc, pnc_db, db_range, spectrum_box, "#2563eb")}
 {line(f_tnc, tnc_db, db_range, spectrum_box, "#d12f2f")}
 {line(f_processed, processed_db, db_range, spectrum_box, "#111827", 2.4)}
-<circle cx="736" cy="434" r="5" fill="#6b7280" /><text x="748" y="439">OpenEar</text>
-<circle cx="840" cy="434" r="5" fill="#2563eb" /><text x="852" y="439">PNC</text>
-<circle cx="910" cy="434" r="5" fill="#d12f2f" /><text x="922" y="439">TNC</text>
-<circle cx="982" cy="434" r="5" fill="#111827" /><text x="994" y="439">Processed TNC</text>
-<text x="82" y="462">Frequency (Hz, log scale)</text>
-<text class="section" x="82" y="496">Rebound above PNC + margin</text>
+<circle cx="736" cy="394" r="5" fill="#6b7280" /><text x="748" y="399">OpenEar</text>
+<circle cx="840" cy="394" r="5" fill="#2563eb" /><text x="852" y="399">PNC</text>
+<circle cx="910" cy="394" r="5" fill="#d12f2f" /><text x="922" y="399">TNC</text>
+<circle cx="982" cy="394" r="5" fill="#111827" /><text x="994" y="399">Processed TNC</text>
+<text x="82" y="422">Frequency (Hz, log scale)</text>
+<text class="section" x="82" y="452">ANC attenuation depth</text>
+{axes(anc_box, "ANC depth dB")}
+{band_rect(anc_box)}
+{line(f_anc, anc_depth_db, anc_range, anc_box, "#d12f2f", 2.4)}
+{line(f_processed_anc, processed_anc_depth_db, anc_range, anc_box, "#111827", 2.4)}
+<circle cx="862" cy="724" r="5" fill="#d12f2f" /><text x="874" y="729">Original ANC</text>
+<circle cx="1004" cy="724" r="5" fill="#111827" /><text x="1016" y="729">After limiting ANC</text>
+<text x="82" y="752">Frequency (Hz, log scale)</text>
+<text class="section" x="82" y="782">Rebound above PNC + margin</text>
 {axes(rebound_box, "Rebound dB")}
 {band_rect(rebound_box)}
 {line(f_rebound, rebound_db, rebound_range, rebound_box, "#d12f2f", 2.4)}
 {line(f_processed_rebound, processed_rebound_db, rebound_range, rebound_box, "#111827", 2.4)}
-<circle cx="880" cy="778" r="5" fill="#d12f2f" /><text x="892" y="783">Original rebound</text>
-<circle cx="1034" cy="778" r="5" fill="#111827" /><text x="1046" y="783">After limiting</text>
-<text x="82" y="778">Frequency (Hz, log scale)</text>
+<circle cx="880" cy="1034" r="5" fill="#d12f2f" /><text x="892" y="1039">Original rebound</text>
+<circle cx="1034" cy="1034" r="5" fill="#111827" /><text x="1046" y="1039">After limiting</text>
+<text x="82" y="1034">Frequency (Hz, log scale)</text>
 </svg>
 """
     path.write_text(svg, encoding="utf-8")

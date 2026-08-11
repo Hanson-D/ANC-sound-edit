@@ -37,6 +37,7 @@ from anc_time_rebound_controller import (
     control_time_rebound,
     validate_pair,
     write_control_svg,
+    write_frequency_svg as write_time_frequency_svg,
     write_report_html as write_control_report_html,
     write_trace_csv,
 )
@@ -503,6 +504,17 @@ class AncReboundGui(tk.Tk):
 
         svg_path = unique_output_path(out_dir / "time_control.svg")
         write_control_svg(svg_path, frame_times_s, pnc_rms_db, tnc_rms_db, controlled_rms_db, applied_gain_db, margin, "ANC time-domain rebound control")
+        frequency_svg_path = unique_output_path(out_dir / "time_frequency_curves.svg")
+        write_time_frequency_svg(
+            frequency_svg_path,
+            pnc.samples,
+            tnc.samples,
+            controlled,
+            tnc.sample_rate,
+            params["low_hz"],
+            params["high_hz"],
+            "ANC time-domain control frequency curves",
+        )
         report_path = unique_output_path(out_dir / "time_control_report.html")
         files = {
             "pnc": Path(self.pnc_var.get()),
@@ -512,8 +524,9 @@ class AncReboundGui(tk.Tk):
             "metrics_csv": metrics_path,
             "events_csv": events_path,
             "svg": svg_path,
+            "frequency_svg": frequency_svg_path,
         }
-        write_control_report_html(report_path, svg_path, time_metrics, files, params["low_hz"], params["high_hz"], margin)
+        write_control_report_html(report_path, svg_path, frequency_svg_path, time_metrics, files, params["low_hz"], params["high_hz"], margin)
 
         rms_chart = {
             "type": "time",
@@ -531,11 +544,19 @@ class AncReboundGui(tk.Tk):
             "title": "目标频段 RMS 与控制增益",
         }
         spectrum_chart = self.make_time_control_spectrum_chart(pnc.samples, tnc.samples, controlled, tnc.sample_rate)
+        anc_chart = self.make_time_control_anc_chart(
+            pnc.samples,
+            tnc.samples,
+            controlled,
+            tnc.sample_rate,
+            params["low_hz"],
+            params["high_hz"],
+        )
         chart = {
             "type": "panels",
             "title": "时域控制结果",
-            "description": "上图显示时域反弹控制过程；下图显示控制前后的整体对数频谱。",
-            "panels": [rms_chart, spectrum_chart],
+            "description": "依次显示时域控制过程、TNC频谱、ANC降噪深度。",
+            "panels": [rms_chart, spectrum_chart, anc_chart],
         }
         return {"mode": "control", "output_dir": out_dir, "report": report_path, "time": time_metrics, "chart": chart}
 
@@ -596,7 +617,7 @@ class AncReboundGui(tk.Tk):
             end_transition_hz,
         )
 
-        chart = {
+        anc_chart = {
             "type": "frequency",
             "x": None,
             "x_range": (1.0, min(float(curves["freq_hz"][-1]), 22000.0)),
@@ -617,6 +638,13 @@ class AncReboundGui(tk.Tk):
             ("目标 ANC", target_anc, "#2563eb"),
             ("修改后 ANC", modified_anc, "#111827"),
         ]
+        tnc_chart = self.make_slope_tnc_chart(curves, start_hz, end_hz)
+        chart = {
+            "type": "panels",
+            "title": "斜率平滑结果",
+            "description": "上图显示 ANC 降噪深度；下图显示 PNC、原始TNC、修改后TNC 的频谱。",
+            "panels": [anc_chart, tnc_chart],
+        }
         freqs = curves["freq_hz"]
         boost_scale = float(curves.get("boost_scale", np.asarray([1.0]))[0])
         input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
@@ -654,7 +682,7 @@ class AncReboundGui(tk.Tk):
         _, pnc_db = simplify_curve_log(freqs[mask], curves["pnc_db"][mask])
         _, tnc_db = simplify_curve_log(freqs[mask], curves["tnc_db"][mask])
         _, processed_db = simplify_curve_log(freqs[mask], curves["processed_db"][mask])
-        return {
+        spectrum_chart = {
             "type": "frequency",
             "x": x_values,
             "x_range": (1.0, max_freq),
@@ -670,6 +698,53 @@ class AncReboundGui(tk.Tk):
                 ("处理后 TNC", processed_db, "#111827"),
             ],
             "title": "频谱概览",
+        }
+        _, original_anc = simplify_curve_log(freqs[mask], curves["pnc_db"][mask] - curves["tnc_db"][mask])
+        _, processed_anc = simplify_curve_log(freqs[mask], curves["pnc_db"][mask] - curves["processed_db"][mask])
+        anc_chart = {
+            "type": "frequency",
+            "x": x_values,
+            "x_range": (1.0, max_freq),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "ANC 显示值 (dB，降噪为负)",
+            "description": "可视化对象：原始 ANC 与处理后 ANC 的降噪深度曲线；负值代表降噪更深。",
+            "band": (low_hz, high_hz),
+            "series": [
+                ("原始 ANC", -original_anc, "#d12f2f"),
+                ("处理后 ANC", -processed_anc, "#111827"),
+            ],
+            "title": "ANC 降噪深度",
+        }
+        return {
+            "type": "panels",
+            "title": "完整分析频域结果",
+            "description": "上图显示 TNC/PNC 频谱；下图显示 ANC 降噪深度。",
+            "panels": [spectrum_chart, anc_chart],
+        }
+
+    def make_slope_tnc_chart(self, curves: dict, start_hz: float, end_hz: float) -> dict:
+        freqs = curves["freq_hz"]
+        max_freq = min(float(freqs[-1]), 22000.0)
+        mask = (freqs >= 1.0) & (freqs <= max_freq)
+        x_values, pnc_db = simplify_curve_log(freqs[mask], curves["pnc_db"][mask])
+        _, original_tnc_db = simplify_curve_log(freqs[mask], curves["original_tnc_db"][mask])
+        _, modified_tnc_db = simplify_curve_log(freqs[mask], curves["modified_tnc_db"][mask])
+        return {
+            "type": "frequency",
+            "x": x_values,
+            "x_range": (1.0, max_freq),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "幅度 (dB)",
+            "description": "可视化对象：PNC、原始TNC、斜率平滑后TNC 的频谱幅度曲线。",
+            "band": (start_hz, end_hz),
+            "series": [
+                ("PNC", pnc_db, "#2563eb"),
+                ("原始 TNC", original_tnc_db, "#d12f2f"),
+                ("修改后 TNC", modified_tnc_db, "#111827"),
+            ],
+            "title": "TNC 频谱对比",
         }
 
     def make_time_control_spectrum_chart(
@@ -702,6 +777,39 @@ class AncReboundGui(tk.Tk):
                 ("控制后 TNC", controlled_values, "#111827"),
             ],
             "title": "整体频谱对比",
+        }
+
+    def make_time_control_anc_chart(
+        self,
+        pnc_samples: np.ndarray,
+        tnc_samples: np.ndarray,
+        controlled_samples: np.ndarray,
+        sample_rate: int,
+        low_hz: float,
+        high_hz: float,
+    ) -> dict:
+        min_len = min(len(pnc_samples), len(tnc_samples), len(controlled_samples))
+        freqs, pnc_db, _ = spectrum_curve(pnc_samples[:min_len], sample_rate)
+        _, tnc_db, _ = spectrum_curve(tnc_samples[:min_len], sample_rate)
+        _, controlled_db, _ = spectrum_curve(controlled_samples[:min_len], sample_rate)
+        max_freq = min(float(freqs[-1]), 22000.0)
+        visible = (freqs >= 1.0) & (freqs <= max_freq)
+        x_values, original_anc = simplify_curve_log(freqs[visible], pnc_db[visible] - tnc_db[visible])
+        _, controlled_anc = simplify_curve_log(freqs[visible], pnc_db[visible] - controlled_db[visible])
+        return {
+            "type": "frequency",
+            "x": x_values,
+            "x_range": (1.0, max_freq),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "ANC 显示值 (dB，降噪为负)",
+            "description": "可视化对象：原始 ANC 与时域控制后 ANC 的降噪深度曲线；负值代表降噪更深。",
+            "band": (low_hz, high_hz),
+            "series": [
+                ("原始 ANC", -original_anc, "#d12f2f"),
+                ("控制后 ANC", -controlled_anc, "#111827"),
+            ],
+            "title": "ANC 降噪深度",
         }
 
     def apply_result(self, result: dict) -> None:

@@ -34,7 +34,17 @@ from anc_rebound_analyzer import (
     write_time_events_csv,
     write_time_metrics_csv,
 )
-from audio_band_limiter import EPS, nice_range, read_wav, svg_polyline, unique_output_path, write_wav
+from audio_band_limiter import (
+    EPS,
+    log_ticks,
+    nice_range,
+    read_wav,
+    simplify_curve_log,
+    spectrum_curve,
+    svg_polyline,
+    unique_output_path,
+    write_wav,
+)
 
 
 def validate_pair(pnc, tnc) -> None:
@@ -228,6 +238,108 @@ text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
     path.write_text(svg, encoding="utf-8")
 
 
+def write_frequency_svg(
+    path: Path,
+    pnc_samples: np.ndarray,
+    tnc_samples: np.ndarray,
+    controlled_samples: np.ndarray,
+    sample_rate: int,
+    low_hz: float,
+    high_hz: float,
+    title: str,
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    min_len = min(len(pnc_samples), len(tnc_samples), len(controlled_samples))
+    freqs, pnc_db, _ = spectrum_curve(pnc_samples[:min_len], sample_rate)
+    _, tnc_db, _ = spectrum_curve(tnc_samples[:min_len], sample_rate)
+    _, controlled_db, _ = spectrum_curve(controlled_samples[:min_len], sample_rate)
+    min_freq = 1.0
+    max_freq = min(float(freqs[-1]), 22000.0)
+    visible = (freqs >= min_freq) & (freqs <= max_freq)
+    x_range = (min_freq, max_freq)
+
+    x_values, pnc_values = simplify_curve_log(freqs[visible], pnc_db[visible], min_hz=min_freq)
+    _, tnc_values = simplify_curve_log(freqs[visible], tnc_db[visible], min_hz=min_freq)
+    _, controlled_values = simplify_curve_log(freqs[visible], controlled_db[visible], min_hz=min_freq)
+    _, original_anc = simplify_curve_log(freqs[visible], -(pnc_db[visible] - tnc_db[visible]), min_hz=min_freq)
+    _, controlled_anc = simplify_curve_log(freqs[visible], -(pnc_db[visible] - controlled_db[visible]), min_hz=min_freq)
+
+    spectrum_range = nice_range([pnc_values, tnc_values, controlled_values])
+    anc_range = nice_range([original_anc, controlled_anc])
+    width, height = 1240, 760
+    margin_l, margin_r = 82, 36
+    plot_w = width - margin_l - margin_r
+    spectrum_box = (margin_l, 92, plot_w, 250)
+    anc_box = (margin_l, 466, plot_w, 190)
+
+    def x_to_px(value: float, box) -> float:
+        x0, _, w, _ = box
+        return x0 + (np.log10(value) - np.log10(x_range[0])) / max(np.log10(x_range[1]) - np.log10(x_range[0]), EPS) * w
+
+    def band_rect(box) -> str:
+        x0, y0, w, h = box
+        low = max(low_hz, x_range[0])
+        high = min(high_hz, x_range[1])
+        if high <= low:
+            return ""
+        bx = x_to_px(low, box)
+        bx1 = x_to_px(high, box)
+        return f'<rect x="{bx:.2f}" y="{y0}" width="{(bx1 - bx):.2f}" height="{h}" fill="#f6c453" opacity="0.18" />'
+
+    def axes(box, y_label):
+        x0, y0, w, h = box
+        ticks = []
+        for tick in log_ticks(x_range[0], x_range[1]):
+            x = x_to_px(tick, box)
+            label = f"{tick / 1000:g}k" if tick >= 1000 else f"{tick:g}"
+            ticks.append(
+                f'<line x1="{x:.2f}" y1="{y0+h}" x2="{x:.2f}" y2="{y0+h+6}" stroke="#6b7280" />'
+                f'<text x="{x:.2f}" y="{y0+h+24}" text-anchor="middle">{label}</text>'
+            )
+        return (
+            f'<rect x="{x0}" y="{y0}" width="{w}" height="{h}" fill="#ffffff" stroke="#d1d5db" />'
+            f'{"".join(ticks)}'
+            f'<text x="{x0 - 52}" y="{y0 + h / 2}" transform="rotate(-90 {x0 - 52},{y0 + h / 2})" '
+            f'text-anchor="middle">{html.escape(y_label)}</text>'
+        )
+
+    def line(freq, values, y_range, box, color, width_px=2.0):
+        points = svg_polyline(freq, values, x_range, y_range, box, x_scale="log")
+        return f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="{width_px}" />'
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+<style>
+text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #111827; font-size: 14px; }}
+.small {{ fill: #4b5563; font-size: 12px; }}
+.title {{ font-size: 22px; font-weight: 650; }}
+.section {{ font-size: 16px; font-weight: 650; }}
+</style>
+<rect width="100%" height="100%" fill="#f9fafb" />
+<text class="title" x="40" y="42">{html.escape(title)}</text>
+<text class="small" x="40" y="66">Frequency axis is logarithmic. ANC is shown as attenuation depth; negative values mean stronger noise reduction.</text>
+<text class="section" x="82" y="82">TNC spectrum</text>
+{axes(spectrum_box, "Magnitude dB")}
+{band_rect(spectrum_box)}
+{line(x_values, pnc_values, spectrum_range, spectrum_box, "#2563eb")}
+{line(x_values, tnc_values, spectrum_range, spectrum_box, "#d12f2f")}
+{line(x_values, controlled_values, spectrum_range, spectrum_box, "#111827", 2.4)}
+<circle cx="788" cy="380" r="5" fill="#2563eb" /><text x="800" y="385">PNC</text>
+<circle cx="852" cy="380" r="5" fill="#d12f2f" /><text x="864" y="385">Original TNC</text>
+<circle cx="990" cy="380" r="5" fill="#111827" /><text x="1002" y="385">Controlled TNC</text>
+<text x="82" y="408">Frequency (Hz, log scale)</text>
+<text class="section" x="82" y="452">ANC attenuation depth</text>
+{axes(anc_box, "ANC depth dB")}
+{band_rect(anc_box)}
+{line(x_values, original_anc, anc_range, anc_box, "#d12f2f", 2.4)}
+{line(x_values, controlled_anc, anc_range, anc_box, "#111827", 2.4)}
+<circle cx="862" cy="694" r="5" fill="#d12f2f" /><text x="874" y="699">Original ANC</text>
+<circle cx="1004" cy="694" r="5" fill="#111827" /><text x="1016" y="699">Controlled ANC</text>
+<text x="82" y="722">Frequency (Hz, log scale)</text>
+</svg>
+"""
+    path.write_text(svg, encoding="utf-8")
+
+
 def summarize_metrics(metrics: Iterable[TimeReboundMetrics], source: str) -> TimeReboundMetrics:
     selected = [item for item in metrics if item.source == source]
     if len(selected) != 1:
@@ -238,6 +350,7 @@ def summarize_metrics(metrics: Iterable[TimeReboundMetrics], source: str) -> Tim
 def write_report_html(
     path: Path,
     svg_path: Path,
+    frequency_svg_path: Path | None,
     metrics: List[TimeReboundMetrics],
     files: dict,
     low_hz: float,
@@ -246,6 +359,7 @@ def write_report_html(
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     svg = svg_path.read_text(encoding="utf-8")
+    frequency_svg = frequency_svg_path.read_text(encoding="utf-8") if frequency_svg_path else ""
     rows = []
     for item in metrics:
         rows.append(
@@ -300,6 +414,8 @@ code {{ background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }}
 </table>
 <h2>Control Curve</h2>
 {svg}
+<h2>Frequency Curves</h2>
+{frequency_svg}
 </body>
 </html>
 """
@@ -410,6 +526,17 @@ def main() -> None:
         args.margin_db,
         "ANC time-domain rebound control",
     )
+    frequency_svg_path = unique_output_path(args.output_dir / "time_frequency_curves.svg")
+    write_frequency_svg(
+        frequency_svg_path,
+        pnc.samples,
+        tnc.samples,
+        controlled,
+        tnc.sample_rate,
+        args.low_hz,
+        args.high_hz,
+        "ANC time-domain control frequency curves",
+    )
 
     files = {
         "pnc": args.pnc,
@@ -419,9 +546,10 @@ def main() -> None:
         "metrics_csv": metrics_path,
         "events_csv": events_path,
         "svg": svg_path,
+        "frequency_svg": frequency_svg_path,
     }
     report_path = unique_output_path(args.output_dir / "time_control_report.html")
-    write_report_html(report_path, svg_path, time_metrics, files, args.low_hz, args.high_hz, args.margin_db)
+    write_report_html(report_path, svg_path, frequency_svg_path, time_metrics, files, args.low_hz, args.high_hz, args.margin_db)
 
     original = summarize_metrics(time_metrics, "original_tnc")
     controlled_metrics = summarize_metrics(time_metrics, "processed_tnc")
