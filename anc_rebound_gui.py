@@ -502,17 +502,17 @@ class AncReboundGui(tk.Tk):
             "x_range": (1.0, max(end_hz * 2.0, end_hz + 100, 200)),
             "x_scale": "log",
             "x_label": "频率 (Hz，对数坐标)",
-            "y_label": "ANC 降噪量 (dB)",
-            "description": "可视化对象：按 ANC=PNC(dB)-TNC(dB) 得到的原始、目标、修改后 ANC 降噪量曲线。",
+            "y_label": "ANC 显示值 (dB，降噪为负)",
+            "description": "可视化对象：ANC降噪量曲线。内部仍按 PNC(dB)-TNC(dB) 计算；界面显示为相反数，所以降噪呈现为负值。",
             "band": (start_hz, end_hz),
             "series": [],
             "title": "ANC 降噪量斜率",
         }
         visible = curves["freq_hz"] <= chart["x"][-1]
         chart["series"] = [
-            ("原始 ANC", curves["original_anc_db"][visible], "#d12f2f"),
-            ("目标 ANC", curves["target_anc_db"][visible], "#2563eb"),
-            ("修改后 ANC", curves["modified_anc_db"][visible], "#111827"),
+            ("原始 ANC", -curves["original_anc_db"][visible], "#d12f2f"),
+            ("目标 ANC", -curves["target_anc_db"][visible], "#2563eb"),
+            ("修改后 ANC", -curves["modified_anc_db"][visible], "#111827"),
         ]
         freqs = curves["freq_hz"]
         slope_rows = [
