@@ -629,11 +629,11 @@ class AncReboundGui(tk.Tk):
             "series": [],
             "title": "ANC 降噪量斜率",
         }
-        visible = (curves["freq_hz"] >= chart["x_range"][0]) & (curves["freq_hz"] <= chart["x_range"][1])
-        chart["x"], original_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["original_anc_db"][visible])
+        visible = (curves["freq_hz"] >= anc_chart["x_range"][0]) & (curves["freq_hz"] <= anc_chart["x_range"][1])
+        anc_chart["x"], original_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["original_anc_db"][visible])
         _, target_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["target_anc_db"][visible])
         _, modified_anc = simplify_curve_log(curves["freq_hz"][visible], -curves["modified_anc_db"][visible])
-        chart["series"] = [
+        anc_chart["series"] = [
             ("原始 ANC", original_anc, "#d12f2f"),
             ("目标 ANC", target_anc, "#2563eb"),
             ("修改后 ANC", modified_anc, "#111827"),
