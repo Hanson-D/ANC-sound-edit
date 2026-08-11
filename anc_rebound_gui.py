@@ -13,7 +13,7 @@ import traceback
 import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox
-from typing import List
+from typing import List, Tuple
 import tkinter as tk
 from tkinter import ttk
 
@@ -137,6 +137,18 @@ class AncReboundGui(tk.Tk):
         ttk.Button(analysis, text="运行完整分析", command=self.run_full_analysis).grid(
             row=5, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
+        self._help_table(
+            analysis,
+            6,
+            [
+                ("低频起点/终点 Hz", "定义要观察和处理的反弹频段。低频反弹通常看 0-100 Hz；对数图从 1 Hz 起显示。"),
+                ("Margin 列表 dB", "判断反弹的容忍余量。0 表示 TNC 只要高于 PNC 就算反弹；1,3 表示允许高出 1/3 dB。可填 0,1,3。"),
+                ("时间窗 ms", "时域反弹统计的 RMS 窗长。低频建议 200 ms 左右，太短会让 0-100 Hz 的 RMS 不稳定。"),
+                ("步长 ms", "RMS 窗口移动间隔。25 ms 可较细地定位事件时间。"),
+                ("最短事件 ms", "短于该时长的超限片段不计为一次反弹，避免把瞬时抖动算进去。"),
+                ("合并间隔 ms", "两段反弹中间间隔小于该值时合并为同一次事件。"),
+            ],
+        )
 
         self._section_note(
             control,
@@ -157,6 +169,20 @@ class AncReboundGui(tk.Tk):
         ttk.Button(control, text="运行时域反弹控制", command=self.run_time_control).grid(
             row=7, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
+        self._help_table(
+            control,
+            8,
+            [
+                ("低频起点/终点 Hz", "只控制这个频段内的 TNC 低频分量；频段外残差信号保持不动。"),
+                ("控制 Margin dB", "控制目标为 TNC 目标频段 RMS 不高于 PNC + Margin。0 表示尽量压到不高于 PNC。"),
+                ("Safety dB", "额外安全余量。设为 1 表示目标压到 PNC + Margin - 1 dB，更容易减少事件次数。"),
+                ("时间窗/步长 ms", "用于检测时域反弹事件，也用于生成控制包络。默认 200/25 ms。"),
+                ("Attack ms", "反弹出现时增益压低的速度。越小越快，事件更少，但更可能产生包络痕迹。"),
+                ("Release ms", "反弹结束后增益恢复速度。越大越平滑，越小越激进。"),
+                ("最大衰减 dB", "限制最多压低多少 dB，避免处理过猛。"),
+                ("最短事件/合并间隔 ms", "用于控制前后事件数量统计，定义同完整分析。"),
+            ],
+        )
 
         self._section_note(
             slope,
@@ -176,6 +202,17 @@ class AncReboundGui(tk.Tk):
         ttk.Button(slope, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).grid(
             row=3, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
+        self._help_table(
+            slope,
+            4,
+            [
+                ("起始频率 Hz", "要替换的 ANC 降噪量曲线片段起点。计算仍用 ANC=PNC(dB)-TNC(dB)，界面显示为负值降噪。"),
+                ("替代长度 Hz", "从起始频率往后的替代宽度。例如起始 30、长度 50 表示替换 30-80 Hz。"),
+                ("平滑模式", "平缓：首尾更顺，默认建议；线性：端点之间直线过渡。"),
+                ("输出 WAV", "PNC 不动，通过缩放 TNC 频谱幅度生成新的 TNC，用来让 ANC 曲线在该段更平缓。"),
+                ("斜率指标", "重点看最大局部斜率、P95 局部斜率、有效宽度和集中度；平均斜率受端点约束，不是主要判断。"),
+            ],
+        )
 
         self._dir_row(output, 0, "输出目录", self.output_dir_var)
         ttk.Button(output, text="打开输出文件夹", command=self.open_output_folder).grid(
@@ -187,6 +224,16 @@ class AncReboundGui(tk.Tk):
         ttk.Label(output, text="当前状态").grid(row=3, column=0, sticky="w", pady=(14, 0))
         ttk.Label(output, textvariable=self.status_var, wraplength=310).grid(
             row=4, column=0, columnspan=4, sticky="ew", pady=(4, 0)
+        )
+        self._help_table(
+            output,
+            5,
+            [
+                ("输出目录", "每个任务会在该目录下创建独立子目录，例如 full_analysis、time_control、slope_flattening。"),
+                ("HTML 报告", "包含图、指标表和输出文件路径，适合保存或发给同事查看。"),
+                ("CSV 文件", "保存逐频点或逐时间窗数据，适合后续统计和画图。"),
+                ("WAV 文件", "处理后的 TNC 音频，用于主观听感或对比实验。"),
+            ],
         )
 
         right = ttk.Frame(root)
@@ -254,6 +301,16 @@ class AncReboundGui(tk.Tk):
         ttk.Label(parent, text=text, wraplength=330, foreground="#374151").grid(
             row=row, column=0, columnspan=4, sticky="ew", pady=(0, 10)
         )
+
+    def _help_table(self, parent, row: int, items: List[Tuple[str, str]]) -> None:
+        frame = ttk.LabelFrame(parent, text="参数定义与作用", padding=8)
+        frame.grid(row=row, column=0, columnspan=4, sticky="ew", pady=(12, 0))
+        frame.columnconfigure(1, weight=1)
+        for index, (name, description) in enumerate(items):
+            ttk.Label(frame, text=name, width=16).grid(row=index, column=0, sticky="nw", pady=3, padx=(0, 8))
+            ttk.Label(frame, text=description, wraplength=285, foreground="#374151").grid(
+                row=index, column=1, sticky="ew", pady=3
+            )
 
     def pick_file(self, var: tk.StringVar) -> None:
         path = filedialog.askopenfilename(filetypes=[("WAV 音频文件", "*.wav *.WAV"), ("所有文件", "*.*")])
