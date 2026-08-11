@@ -80,7 +80,7 @@ class AncReboundGui(tk.Tk):
         self.max_atten_var = tk.StringVar(value="18")
         self.slope_start_var = tk.StringVar(value="30")
         self.slope_length_var = tk.StringVar(value="50")
-        self.slope_mode_var = tk.StringVar(value="smoothstep")
+        self.slope_mode_var = tk.StringVar(value="平缓")
         self.status_var = tk.StringVar(value="就绪")
         self.last_output_dir: Path | None = None
 
@@ -96,49 +96,96 @@ class AncReboundGui(tk.Tk):
         controls = ttk.Frame(root)
         controls.grid(row=0, column=0, sticky="nsw", padx=(0, 12))
         controls.columnconfigure(1, weight=1)
+        controls.rowconfigure(1, weight=1)
 
-        self._file_row(controls, 0, "OpenEar", self.open_ear_var)
-        self._file_row(controls, 1, "PNC", self.pnc_var)
-        self._file_row(controls, 2, "TNC", self.tnc_var)
-        self._dir_row(controls, 3, "Output", self.output_dir_var)
+        files = ttk.LabelFrame(controls, text="音频文件", padding=10)
+        files.grid(row=0, column=0, columnspan=3, sticky="ew")
+        files.columnconfigure(1, weight=1)
+        self._file_row(files, 0, "开耳 OpenEar", self.open_ear_var)
+        self._file_row(files, 1, "被动 PNC", self.pnc_var)
+        self._file_row(files, 2, "总降噪 TNC", self.tnc_var)
 
-        params = ttk.LabelFrame(controls, text="参数", padding=10)
-        params.grid(row=4, column=0, columnspan=3, sticky="ew", pady=(12, 0))
-        for col in range(4):
-            params.columnconfigure(col, weight=1)
-        self._entry(params, 0, 0, "Low Hz", self.low_hz_var)
-        self._entry(params, 0, 2, "High Hz", self.high_hz_var)
-        self._entry(params, 1, 0, "Margins dB", self.margins_var)
-        self._entry(params, 1, 2, "Control margin", self.margin_var)
-        self._entry(params, 2, 0, "Window ms", self.time_window_var)
-        self._entry(params, 2, 2, "Hop ms", self.time_hop_var)
-        self._entry(params, 3, 0, "Min event ms", self.min_event_var)
-        self._entry(params, 3, 2, "Merge gap ms", self.merge_gap_var)
-        self._entry(params, 4, 0, "Attack ms", self.attack_var)
-        self._entry(params, 4, 2, "Release ms", self.release_var)
-        self._entry(params, 5, 0, "Safety dB", self.safety_var)
-        self._entry(params, 5, 2, "Max atten dB", self.max_atten_var)
-        self._entry(params, 6, 0, "Slope start Hz", self.slope_start_var)
-        self._entry(params, 6, 2, "Slope length Hz", self.slope_length_var)
-        ttk.Label(params, text="Slope mode").grid(row=7, column=0, sticky="w", pady=4, padx=(0, 6))
+        task_tabs = ttk.Notebook(controls)
+        task_tabs.grid(row=1, column=0, columnspan=3, sticky="nsew", pady=(12, 0))
+
+        analysis = ttk.Frame(task_tabs, padding=10)
+        control = ttk.Frame(task_tabs, padding=10)
+        slope = ttk.Frame(task_tabs, padding=10)
+        output = ttk.Frame(task_tabs, padding=10)
+        task_tabs.add(analysis, text="完整分析")
+        task_tabs.add(control, text="时域控制")
+        task_tabs.add(slope, text="斜率平滑")
+        task_tabs.add(output, text="输出")
+
+        for frame in (analysis, control, slope, output):
+            for col in range(4):
+                frame.columnconfigure(col, weight=1)
+
+        self._section_note(
+            analysis,
+            0,
+            "用途：同时分析频域反弹、时域反弹次数，并生成多个频域限幅后的 TNC 版本。需要 OpenEar、PNC、TNC。",
+        )
+        self._entry(analysis, 1, 0, "低频起点 Hz", self.low_hz_var)
+        self._entry(analysis, 1, 2, "低频终点 Hz", self.high_hz_var)
+        self._entry(analysis, 2, 0, "Margin 列表 dB", self.margins_var)
+        self._entry(analysis, 3, 0, "时间窗 ms", self.time_window_var)
+        self._entry(analysis, 3, 2, "步长 ms", self.time_hop_var)
+        self._entry(analysis, 4, 0, "最短事件 ms", self.min_event_var)
+        self._entry(analysis, 4, 2, "合并间隔 ms", self.merge_gap_var)
+        ttk.Button(analysis, text="运行完整分析", command=self.run_full_analysis).grid(
+            row=5, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+        )
+
+        self._section_note(
+            control,
+            0,
+            "用途：PNC 不动，只对 TNC 的目标低频带做时域包络控制，减少反弹次数。需要 PNC、TNC。",
+        )
+        self._entry(control, 1, 0, "低频起点 Hz", self.low_hz_var)
+        self._entry(control, 1, 2, "低频终点 Hz", self.high_hz_var)
+        self._entry(control, 2, 0, "控制 Margin dB", self.margin_var)
+        self._entry(control, 2, 2, "Safety dB", self.safety_var)
+        self._entry(control, 3, 0, "时间窗 ms", self.time_window_var)
+        self._entry(control, 3, 2, "步长 ms", self.time_hop_var)
+        self._entry(control, 4, 0, "Attack ms", self.attack_var)
+        self._entry(control, 4, 2, "Release ms", self.release_var)
+        self._entry(control, 5, 0, "最短事件 ms", self.min_event_var)
+        self._entry(control, 5, 2, "合并间隔 ms", self.merge_gap_var)
+        self._entry(control, 6, 0, "最大衰减 dB", self.max_atten_var)
+        ttk.Button(control, text="运行时域反弹控制", command=self.run_time_control).grid(
+            row=7, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+        )
+
+        self._section_note(
+            slope,
+            0,
+            "用途：按频率定义 ANC=PNC(dB)-TNC(dB)，重塑选定频段内的 ANC 降噪量斜率。需要 PNC、TNC。",
+        )
+        self._entry(slope, 1, 0, "起始频率 Hz", self.slope_start_var)
+        self._entry(slope, 1, 2, "替代长度 Hz", self.slope_length_var)
+        ttk.Label(slope, text="平滑模式").grid(row=2, column=0, sticky="w", pady=4, padx=(0, 6))
         ttk.Combobox(
-            params,
+            slope,
             textvariable=self.slope_mode_var,
-            values=("smoothstep", "linear"),
+            values=("平缓", "线性"),
             width=9,
             state="readonly",
-        ).grid(row=7, column=1, sticky="ew", pady=4)
+        ).grid(row=2, column=1, sticky="ew", pady=4)
+        ttk.Button(slope, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).grid(
+            row=3, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+        )
 
-        actions = ttk.Frame(controls)
-        actions.grid(row=5, column=0, columnspan=3, sticky="ew", pady=(12, 0))
-        ttk.Button(actions, text="运行完整分析", command=self.run_full_analysis).pack(fill=tk.X, pady=(0, 8))
-        ttk.Button(actions, text="运行时域控制", command=self.run_time_control).pack(fill=tk.X, pady=(0, 8))
-        ttk.Button(actions, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).pack(fill=tk.X, pady=(0, 8))
-        ttk.Button(actions, text="打开输出文件夹", command=self.open_output_folder).pack(fill=tk.X, pady=(0, 8))
-        ttk.Button(actions, text="打开 HTML 报告", command=self.open_report).pack(fill=tk.X)
-
-        ttk.Label(controls, textvariable=self.status_var, wraplength=310).grid(
-            row=6, column=0, columnspan=3, sticky="ew", pady=(12, 0)
+        self._dir_row(output, 0, "输出目录", self.output_dir_var)
+        ttk.Button(output, text="打开输出文件夹", command=self.open_output_folder).grid(
+            row=1, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+        )
+        ttk.Button(output, text="打开 HTML 报告", command=self.open_report).grid(
+            row=2, column=0, columnspan=4, sticky="ew", pady=(8, 0)
+        )
+        ttk.Label(output, text="当前状态").grid(row=3, column=0, sticky="w", pady=(14, 0))
+        ttk.Label(output, textvariable=self.status_var, wraplength=310).grid(
+            row=4, column=0, columnspan=4, sticky="ew", pady=(4, 0)
         )
 
         right = ttk.Frame(root)
@@ -162,13 +209,13 @@ class AncReboundGui(tk.Tk):
         self.metrics_table = ttk.Treeview(self.summary, columns=columns, show="headings")
         headings = {
             "kind": "类型",
-            "margin": "Margin",
+            "margin": "余量",
             "source": "来源/频点",
             "count": "次数",
             "duration": "持续时间",
-            "max_db": "Max dB",
-            "mean_db": "Mean dB",
-            "extra": "Extra",
+            "max_db": "峰值/最大",
+            "mean_db": "平均/P95",
+            "extra": "补充",
         }
         for col, text in headings.items():
             self.metrics_table.heading(col, text=text)
@@ -191,19 +238,24 @@ class AncReboundGui(tk.Tk):
     def _file_row(self, parent, row: int, label: str, var: tk.StringVar) -> None:
         ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", pady=3)
         ttk.Entry(parent, textvariable=var, width=34).grid(row=row, column=1, sticky="ew", pady=3)
-        ttk.Button(parent, text="Browse", command=lambda: self.pick_file(var)).grid(row=row, column=2, padx=(6, 0), pady=3)
+        ttk.Button(parent, text="选择", command=lambda: self.pick_file(var)).grid(row=row, column=2, padx=(6, 0), pady=3)
 
     def _dir_row(self, parent, row: int, label: str, var: tk.StringVar) -> None:
         ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", pady=3)
         ttk.Entry(parent, textvariable=var, width=34).grid(row=row, column=1, sticky="ew", pady=3)
-        ttk.Button(parent, text="Browse", command=lambda: self.pick_dir(var)).grid(row=row, column=2, padx=(6, 0), pady=3)
+        ttk.Button(parent, text="选择", command=lambda: self.pick_dir(var)).grid(row=row, column=2, padx=(6, 0), pady=3)
 
     def _entry(self, parent, row: int, col: int, label: str, var: tk.StringVar) -> None:
         ttk.Label(parent, text=label).grid(row=row, column=col, sticky="w", pady=4, padx=(0, 6))
         ttk.Entry(parent, textvariable=var, width=11).grid(row=row, column=col + 1, sticky="ew", pady=4)
 
+    def _section_note(self, parent, row: int, text: str) -> None:
+        ttk.Label(parent, text=text, wraplength=330, foreground="#374151").grid(
+            row=row, column=0, columnspan=4, sticky="ew", pady=(0, 10)
+        )
+
     def pick_file(self, var: tk.StringVar) -> None:
-        path = filedialog.askopenfilename(filetypes=[("WAV files", "*.wav *.WAV"), ("All files", "*.*")])
+        path = filedialog.askopenfilename(filetypes=[("WAV 音频文件", "*.wav *.WAV"), ("所有文件", "*.*")])
         if path:
             var.set(path)
 
@@ -249,7 +301,7 @@ class AncReboundGui(tk.Tk):
         params = self.read_common_params()
         margins = [float(part.strip()) for part in self.margins_var.get().split(",") if part.strip()]
         if not margins:
-            raise ValueError("Margins dB cannot be empty")
+            raise ValueError("Margin 列表不能为空")
 
         open_ear = read_wav(Path(self.open_ear_var.get()))
         pnc = read_wav(Path(self.pnc_var.get()))
@@ -396,11 +448,11 @@ class AncReboundGui(tk.Tk):
             "x": frame_times_s,
             "series": [
                 ("PNC", pnc_rms_db, "#2563eb"),
-                ("Original TNC", tnc_rms_db, "#d12f2f"),
-                ("Controlled TNC", controlled_rms_db, "#111827"),
-                ("Applied gain dB", applied_gain_db, "#0f766e"),
+                ("原始 TNC", tnc_rms_db, "#d12f2f"),
+                ("控制后 TNC", controlled_rms_db, "#111827"),
+                ("施加增益 dB", applied_gain_db, "#0f766e"),
             ],
-            "title": "Target-band RMS and applied gain",
+            "title": "目标频段 RMS 与控制增益",
         }
         return {"mode": "control", "output_dir": out_dir, "report": report_path, "time": time_metrics, "chart": chart}
 
@@ -408,7 +460,8 @@ class AncReboundGui(tk.Tk):
         params = self.read_common_params()
         start_hz = float(self.slope_start_var.get())
         length_hz = float(self.slope_length_var.get())
-        mode = self.slope_mode_var.get()
+        mode_label = self.slope_mode_var.get()
+        mode = self.slope_mode_value()
         pnc = read_wav(Path(self.pnc_var.get()))
         tnc = read_wav(Path(self.tnc_var.get()))
         validate_pair(pnc, tnc)
@@ -443,35 +496,35 @@ class AncReboundGui(tk.Tk):
             "x": curves["freq_hz"][curves["freq_hz"] <= min(max(end_hz * 2.0, end_hz + 100, 200), curves["freq_hz"][-1])],
             "band": (start_hz, end_hz),
             "series": [],
-            "title": "ANC contribution slope",
+            "title": "ANC 降噪量斜率",
         }
         visible = curves["freq_hz"] <= chart["x"][-1]
         chart["series"] = [
-            ("Original ANC", curves["original_anc_db"][visible], "#d12f2f"),
-            ("Target ANC", curves["target_anc_db"][visible], "#2563eb"),
-            ("Modified ANC", curves["modified_anc_db"][visible], "#111827"),
+            ("原始 ANC", curves["original_anc_db"][visible], "#d12f2f"),
+            ("目标 ANC", curves["target_anc_db"][visible], "#2563eb"),
+            ("修改后 ANC", curves["modified_anc_db"][visible], "#111827"),
         ]
         freqs = curves["freq_hz"]
         slope_rows = [
             {
-                "kind": "ANC slope",
+                "kind": "ANC 斜率",
                 "margin": "",
-                "source": "Original ANC",
+                "source": "原始 ANC",
                 "count": "",
-                "duration": f"width={slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['effective_transition_width_hz']:.1f}Hz",
+                "duration": f"有效宽度={slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['effective_transition_width_hz']:.1f}Hz",
                 "max_db": f"{slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['max_local_slope'] * 10:.3f}/10Hz",
                 "mean_db": f"p95={slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['p95_local_slope'] * 10:.3f}/10Hz",
-                "extra": f"conc={slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}",
+                "extra": f"集中度={slope_shape_metrics(freqs, curves['original_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}",
             },
             {
-                "kind": "ANC slope",
+                "kind": "ANC 斜率",
                 "margin": "",
-                "source": "Modified ANC",
+                "source": "修改后 ANC",
                 "count": "",
-                "duration": f"width={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['effective_transition_width_hz']:.1f}Hz",
+                "duration": f"有效宽度={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['effective_transition_width_hz']:.1f}Hz",
                 "max_db": f"{slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['max_local_slope'] * 10:.3f}/10Hz",
                 "mean_db": f"p95={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['p95_local_slope'] * 10:.3f}/10Hz",
-                "extra": f"conc={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}",
+                "extra": f"集中度={slope_shape_metrics(freqs, curves['modified_anc_db'], start_hz, end_hz)['concentration_ratio']:.2f}; {mode_label}",
             },
         ]
         return {"mode": "slope", "output_dir": out_dir, "report": report_path, "slope_rows": slope_rows, "chart": chart}
@@ -488,9 +541,9 @@ class AncReboundGui(tk.Tk):
                 ("OpenEar", curves["open_db"][mask], "#6b7280"),
                 ("PNC", curves["pnc_db"][mask], "#2563eb"),
                 ("TNC", curves["tnc_db"][mask], "#d12f2f"),
-                ("Processed TNC", curves["processed_db"][mask], "#111827"),
+                ("处理后 TNC", curves["processed_db"][mask], "#111827"),
             ],
-            "title": "Spectrum overview",
+            "title": "频谱概览",
         }
 
     def apply_result(self, result: dict) -> None:
@@ -508,14 +561,14 @@ class AncReboundGui(tk.Tk):
                 "",
                 tk.END,
                 values=(
-                    "frequency",
+                    "频域",
                     f"{metric.margin_db:g}",
                     f"{metric.worst_frequency_hz:.1f} Hz",
                     "",
                     "",
                     f"{metric.max_rebound_db:.2f}",
                     f"{metric.mean_positive_rebound_db:.2f}",
-                    f"bins={metric.changed_stft_bins}",
+                    f"改变bin={metric.changed_stft_bins}",
                 ),
             )
         for metric in result.get("time", []):
@@ -523,14 +576,14 @@ class AncReboundGui(tk.Tk):
                 "",
                 tk.END,
                 values=(
-                    "time",
+                    "时域",
                     f"{metric.margin_db:g}",
-                    metric.source,
+                    self.display_source_name(metric.source),
                     metric.event_count,
                     f"{metric.total_event_duration_s:.3f}s",
                     f"{metric.max_rebound_db:.2f}",
                     f"{metric.mean_positive_rebound_db:.2f}",
-                    f"longest={metric.longest_event_s:.3f}s",
+                    f"最长={metric.longest_event_s:.3f}s",
                 ),
             )
         for row in result.get("slope_rows", []):
@@ -550,6 +603,22 @@ class AncReboundGui(tk.Tk):
             )
         self.last_chart = result.get("chart")
         self.redraw_last_chart()
+
+    def display_source_name(self, value: str) -> str:
+        names = {
+            "original_tnc": "原始 TNC",
+            "processed_tnc": "处理后 TNC",
+        }
+        return names.get(value, value)
+
+    def slope_mode_value(self) -> str:
+        values = {
+            "平缓": "smoothstep",
+            "线性": "linear",
+            "smoothstep": "smoothstep",
+            "linear": "linear",
+        }
+        return values.get(self.slope_mode_var.get(), "smoothstep")
 
     def redraw_last_chart(self) -> None:
         if not self.last_chart:
