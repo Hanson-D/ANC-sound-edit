@@ -200,11 +200,17 @@ python3 anc_slope_flattener.py \
   --tnc tnc.wav \
   --start-hz 30 \
   --length-hz 50 \
+  --start-depth-reduction-db 3 \
+  --end-depth-reduction-db 0 \
   --mode smoothstep \
   --output-dir out/anc_slope
 ```
 
 This replaces the ANC contribution segment from `30 Hz` to `80 Hz`.
+The endpoint reduction options first make the selected endpoint ANC depth
+shallower, then smooth between the adjusted endpoints. For example,
+`--start-depth-reduction-db 3` reduces the start point's ANC depth by 3 dB
+before generating the replacement curve.
 
 Main outputs:
 

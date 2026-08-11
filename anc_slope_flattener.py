@@ -55,14 +55,16 @@ def make_replacement_curve(
     start_hz: float,
     end_hz: float,
     mode: str,
+    start_depth_reduction_db: float,
+    end_depth_reduction_db: float,
 ) -> Tuple[np.ndarray, np.ndarray]:
     if start_hz < freqs[0] or end_hz > freqs[-1]:
         raise ValueError(f"selected range must be inside {freqs[0]:g}-{freqs[-1]:g} Hz")
     if end_hz <= start_hz:
         raise ValueError("end_hz must be greater than start_hz")
 
-    start_value = float(np.interp(start_hz, freqs, anc_db))
-    end_value = float(np.interp(end_hz, freqs, anc_db))
+    start_value = float(np.interp(start_hz, freqs, anc_db)) - start_depth_reduction_db
+    end_value = float(np.interp(end_hz, freqs, anc_db)) - end_depth_reduction_db
     target = anc_db.copy()
     band = (freqs >= start_hz) & (freqs <= end_hz)
     x = (freqs[band] - start_hz) / max(end_hz - start_hz, EPS)
@@ -99,12 +101,22 @@ def flatten_anc_slope(
     hop_size: int,
     max_boost_db: float,
     max_cut_db: float,
+    start_depth_reduction_db: float = 0.0,
+    end_depth_reduction_db: float = 0.0,
 ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
     end_hz = start_hz + length_hz
     freqs, pnc_db = mean_stft_magnitude_db(pnc_samples, sample_rate, frame_size, hop_size)
     _, tnc_db = mean_stft_magnitude_db(tnc_samples, sample_rate, frame_size, hop_size)
     original_anc_db = pnc_db - tnc_db
-    target_anc_db, band = make_replacement_curve(freqs, original_anc_db, start_hz, end_hz, mode)
+    target_anc_db, band = make_replacement_curve(
+        freqs,
+        original_anc_db,
+        start_hz,
+        end_hz,
+        mode,
+        start_depth_reduction_db,
+        end_depth_reduction_db,
+    )
     target_tnc_db = pnc_db - target_anc_db
     gain_db = target_tnc_db - tnc_db
     gain_db = np.clip(gain_db, -abs(max_cut_db), abs(max_boost_db))
@@ -306,6 +318,8 @@ def write_report_html(
     start_hz: float,
     end_hz: float,
     mode: str,
+    start_depth_reduction_db: float,
+    end_depth_reduction_db: float,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
@@ -347,6 +361,7 @@ code {{ background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }}
 <body>
 <h1>ANC Slope Flattening Report</h1>
 <p>ANC definition: <code>PNC_dB - TNC_dB</code>. Replacement range: <strong>{start_hz:g}-{end_hz:g} Hz</strong>. Mode: <strong>{html.escape(mode)}</strong>.</p>
+<p>Endpoint depth reduction: start <strong>{start_depth_reduction_db:g} dB</strong>, end <strong>{end_depth_reduction_db:g} dB</strong>. A positive value makes the ANC depth shallower at that endpoint before smoothing.</p>
 <p>Because start and end values are fixed, average slope is mostly a reference. The main steepness checks are max local slope, p95 local slope, effective transition width, and concentration ratio.</p>
 <h2>Files</h2>
 <ul>
@@ -378,6 +393,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--start-hz", type=float, required=True, help="start frequency of the replaced segment")
     parser.add_argument("--length-hz", type=float, required=True, help="frequency length of the replaced segment")
     parser.add_argument("--mode", choices=["smoothstep", "linear"], default="smoothstep")
+    parser.add_argument("--start-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the start point before smoothing")
+    parser.add_argument("--end-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the end point before smoothing")
     parser.add_argument("--output-dir", type=Path, default=Path("out/anc_slope"))
     parser.add_argument("--frame-size", type=int, default=8192)
     parser.add_argument("--hop-size", type=int, default=2048)
@@ -412,6 +429,8 @@ def main() -> None:
         args.hop_size,
         args.max_boost_db,
         args.max_cut_db,
+        args.start_depth_reduction_db,
+        args.end_depth_reduction_db,
     )
 
     output_wav = args.output_dir / "tnc_anc_slope_flattened.wav"
@@ -421,7 +440,19 @@ def main() -> None:
     write_wav(output_wav, modified_tnc, tnc.sample_rate)
     write_curve_csv(csv_path, curves, args.start_hz, end_hz)
     write_svg(svg_path, curves, args.start_hz, end_hz, "ANC slope flattening")
-    write_report_html(report_path, svg_path, args.pnc, args.tnc, output_wav, curves, args.start_hz, end_hz, args.mode)
+    write_report_html(
+        report_path,
+        svg_path,
+        args.pnc,
+        args.tnc,
+        output_wav,
+        curves,
+        args.start_hz,
+        end_hz,
+        args.mode,
+        args.start_depth_reduction_db,
+        args.end_depth_reduction_db,
+    )
 
     freqs = curves["freq_hz"]
     print(f"Wrote modified TNC WAV: {output_wav}")
