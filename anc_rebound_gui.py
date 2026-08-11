@@ -50,7 +50,7 @@ from anc_slope_flattener import (
     write_report_html as write_slope_report_html,
     write_svg as write_slope_svg,
 )
-from audio_band_limiter import read_wav, write_wav
+from audio_band_limiter import read_wav, simplify_curve, spectrum_curve, write_wav
 
 
 APP_TITLE = "ANC 反弹分析与控制工具"
@@ -511,7 +511,7 @@ class AncReboundGui(tk.Tk):
         }
         write_control_report_html(report_path, svg_path, time_metrics, files, params["low_hz"], params["high_hz"], margin)
 
-        chart = {
+        rms_chart = {
             "type": "time",
             "x": frame_times_s,
             "x_scale": "linear",
@@ -525,6 +525,13 @@ class AncReboundGui(tk.Tk):
                 ("施加增益 dB", applied_gain_db, "#0f766e"),
             ],
             "title": "目标频段 RMS 与控制增益",
+        }
+        spectrum_chart = self.make_time_control_spectrum_chart(pnc.samples, tnc.samples, controlled, tnc.sample_rate)
+        chart = {
+            "type": "panels",
+            "title": "时域控制结果",
+            "description": "上图显示时域反弹控制过程；下图显示控制前后的整体对数频谱。",
+            "panels": [rms_chart, spectrum_chart],
         }
         return {"mode": "control", "output_dir": out_dir, "report": report_path, "time": time_metrics, "chart": chart}
 
@@ -650,6 +657,38 @@ class AncReboundGui(tk.Tk):
             "title": "频谱概览",
         }
 
+    def make_time_control_spectrum_chart(
+        self,
+        pnc_samples: np.ndarray,
+        tnc_samples: np.ndarray,
+        controlled_samples: np.ndarray,
+        sample_rate: int,
+    ) -> dict:
+        min_len = min(len(pnc_samples), len(tnc_samples), len(controlled_samples))
+        freqs, pnc_db, _ = spectrum_curve(pnc_samples[:min_len], sample_rate)
+        _, tnc_db, _ = spectrum_curve(tnc_samples[:min_len], sample_rate)
+        _, controlled_db, _ = spectrum_curve(controlled_samples[:min_len], sample_rate)
+        max_freq = float(freqs[-1])
+        visible = freqs > 0
+        x_values, pnc_values = simplify_curve(freqs[visible], pnc_db[visible])
+        _, tnc_values = simplify_curve(freqs[visible], tnc_db[visible])
+        _, controlled_values = simplify_curve(freqs[visible], controlled_db[visible])
+        return {
+            "type": "frequency",
+            "x": x_values,
+            "x_range": (1.0, max_freq),
+            "x_scale": "log",
+            "x_label": "频率 (Hz，对数坐标)",
+            "y_label": "幅度 (dB)",
+            "description": "可视化对象：PNC、原始TNC、时域控制后TNC 的整体频谱幅度曲线。",
+            "series": [
+                ("PNC", pnc_values, "#2563eb"),
+                ("原始 TNC", tnc_values, "#d12f2f"),
+                ("控制后 TNC", controlled_values, "#111827"),
+            ],
+            "title": "整体频谱对比",
+        }
+
     def apply_result(self, result: dict) -> None:
         self.last_output_dir = result["output_dir"]
         self.last_report = result["report"]
@@ -731,11 +770,53 @@ class AncReboundGui(tk.Tk):
         self.canvas.delete("all")
         width = max(self.canvas.winfo_width(), 200)
         height = max(self.canvas.winfo_height(), 200)
-        x0, y0, x1, y1 = 84, 76, width - 24, height - 76
-        self.canvas.create_text(20, 18, text=chart["title"], anchor="w", font=("Segoe UI", 13, "bold"))
+
+        if chart.get("type") == "panels":
+            self.canvas.create_text(20, 18, text=chart["title"], anchor="w", font=("Segoe UI", 13, "bold"))
+            self.canvas.create_text(
+                20,
+                42,
+                text=chart.get("description", ""),
+                anchor="w",
+                fill="#4b5563",
+                font=("Segoe UI", 9),
+            )
+            panels = chart.get("panels", [])
+            if not panels:
+                return
+            top_margin = 112
+            bottom_margin = 58
+            gap = 58
+            available_height = height - top_margin - bottom_margin - gap * (len(panels) - 1)
+            panel_height = max(120, available_height / len(panels))
+            for index, panel in enumerate(panels):
+                panel_y0 = top_margin + index * (panel_height + gap)
+                panel_y1 = panel_y0 + panel_height
+                if panel_y1 - panel_y0 < 80:
+                    continue
+                self.draw_chart_panel(panel, 84, panel_y0, width - 24, panel_y1)
+            return
+
+        self.draw_chart_panel(chart, 84, 76, width - 24, height - 76, header_x=20, title_y=18, description_y=42)
+
+    def draw_chart_panel(
+        self,
+        chart: dict,
+        x0: float,
+        y0: float,
+        x1: float,
+        y1: float,
+        header_x: float | None = None,
+        title_y: float | None = None,
+        description_y: float | None = None,
+    ) -> None:
+        header_x = x0 if header_x is None else header_x
+        title_y = y0 - 42 if title_y is None else title_y
+        description_y = y0 - 20 if description_y is None else description_y
+        self.canvas.create_text(header_x, title_y, text=chart["title"], anchor="w", font=("Segoe UI", 11, "bold"))
         self.canvas.create_text(
-            20,
-            42,
+            header_x,
+            description_y,
             text=chart.get("description", ""),
             anchor="w",
             fill="#4b5563",
@@ -792,9 +873,9 @@ class AncReboundGui(tk.Tk):
             y = y1 - (tick - ymin) / max(ymax - ymin, 1e-9) * (y1 - y0)
             self.canvas.create_line(x0 - 5, y, x0, y, fill="#6b7280")
             self.canvas.create_text(x0 - 8, y, text=f"{tick:.1f}", anchor="e", fill="#374151", font=("Segoe UI", 9))
-        self.canvas.create_text((x0 + x1) / 2, height - 24, text=chart.get("x_label", ""), fill="#111827", font=("Segoe UI", 10))
+        self.canvas.create_text((x0 + x1) / 2, y1 + 42, text=chart.get("x_label", ""), fill="#111827", font=("Segoe UI", 10))
         self.canvas.create_text(
-            18,
+            x0 - 66,
             (y0 + y1) / 2,
             text=chart.get("y_label", ""),
             angle=90,
