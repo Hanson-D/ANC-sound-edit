@@ -87,6 +87,7 @@ class AncReboundGui(tk.Tk):
         self.slope_end_reduction_var = tk.StringVar(value="0")
         self.slope_start_transition_var = tk.StringVar(value="10")
         self.slope_end_transition_var = tk.StringVar(value="10")
+        self.slope_frame_size_var = tk.StringVar(value="8192")
         self.slope_peak_protection_var = tk.BooleanVar(value=False)
         self.status_var = tk.StringVar(value="就绪")
         self.last_output_dir: Path | None = None
@@ -201,28 +202,37 @@ class AncReboundGui(tk.Tk):
         self._entry(slope, 2, 2, "终点压浅 dB", self.slope_end_reduction_var)
         self._entry(slope, 3, 0, "起点过渡 Hz", self.slope_start_transition_var)
         self._entry(slope, 3, 2, "终点过渡 Hz", self.slope_end_transition_var)
-        ttk.Label(slope, text="平滑模式").grid(row=4, column=0, sticky="w", pady=4, padx=(0, 6))
+        ttk.Label(slope, text="FFT 点数").grid(row=4, column=0, sticky="w", pady=4, padx=(0, 6))
+        ttk.Combobox(
+            slope,
+            textvariable=self.slope_frame_size_var,
+            values=("4096", "8192", "16384", "32768", "65536"),
+            width=9,
+            state="readonly",
+        ).grid(row=4, column=1, sticky="ew", pady=4)
+        ttk.Label(slope, text="平滑模式").grid(row=5, column=0, sticky="w", pady=4, padx=(0, 6))
         ttk.Combobox(
             slope,
             textvariable=self.slope_mode_var,
             values=("平缓", "线性"),
             width=9,
             state="readonly",
-        ).grid(row=4, column=1, sticky="ew", pady=4)
+        ).grid(row=5, column=1, sticky="ew", pady=4)
         ttk.Checkbutton(slope, text="峰值保护", variable=self.slope_peak_protection_var).grid(
-            row=4, column=2, columnspan=2, sticky="w", pady=4
+            row=5, column=2, columnspan=2, sticky="w", pady=4
         )
         ttk.Button(slope, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).grid(
-            row=5, column=0, columnspan=4, sticky="ew", pady=(12, 0)
+            row=6, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
         self._help_table(
             slope,
-            6,
+            7,
             [
                 ("起始频率 Hz", "要替换的 ANC 降噪量曲线片段起点。计算仍用 ANC=PNC(dB)-TNC(dB)，界面显示为负值降噪。"),
                 ("终点频率 Hz", "要替换的 ANC 降噪量曲线片段终点。例如起始 30、终点 80 表示替换 30-80 Hz。"),
                 ("起点/终点压浅 dB", "先把端点 ANC 深度减少指定 dB，再做平滑。起点填 3 表示起点先少 3 dB 降噪深度，会改变整体斜率。"),
                 ("起点/终点过渡 Hz", "在主替代段前后增加平滑接入/接出宽度，避免端点压浅造成突变。0 表示不加额外过渡。"),
+                ("FFT 点数", "决定斜率处理的频点间隔。提供常见 2 的幂选项；点数越大，低频越细，但分析窗越长。"),
                 ("平滑模式", "平缓：首尾更顺，默认建议；线性：端点之间直线过渡。"),
                 ("峰值保护", "关闭时优先让实际 ANC 曲线贴近目标；打开时会收缩正向 boost 来避免导出 WAV 爆峰。"),
                 ("输出 WAV", "PNC 不动，通过缩放 TNC 频谱幅度生成新的 TNC，用来让 ANC 曲线在该段更平缓。"),
@@ -576,6 +586,10 @@ class AncReboundGui(tk.Tk):
         end_depth_reduction_db = float(self.slope_end_reduction_var.get())
         start_transition_hz = float(self.slope_start_transition_var.get())
         end_transition_hz = float(self.slope_end_transition_var.get())
+        frame_size = int(float(self.slope_frame_size_var.get()))
+        if frame_size <= 0:
+            raise ValueError("FFT 点数必须为正数")
+        hop_size = max(1, frame_size // 4)
         protect_peaks = bool(self.slope_peak_protection_var.get())
         mode_label = self.slope_mode_var.get()
         mode = self.slope_mode_value()
@@ -593,8 +607,8 @@ class AncReboundGui(tk.Tk):
             start_hz,
             length_hz,
             mode,
-            8192,
-            2048,
+            frame_size,
+            hop_size,
             18.0,
             18.0,
             start_depth_reduction_db,
@@ -624,6 +638,9 @@ class AncReboundGui(tk.Tk):
             end_depth_reduction_db,
             start_transition_hz,
             end_transition_hz,
+            tnc.sample_rate,
+            frame_size,
+            hop_size,
         )
 
         anc_chart = {
@@ -659,7 +676,8 @@ class AncReboundGui(tk.Tk):
         input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
         output_peak = float(curves.get("output_peak", np.asarray([0.0]))[0])
         protection_label = "峰值保护开" if protect_peaks else "峰值保护关"
-        peak_note = f"{protection_label}; boost缩放={boost_scale * 100:.1f}%; 峰值 {input_peak:.3f}->{output_peak:.3f}"
+        resolution_note = f"频率间隔={tnc.sample_rate / frame_size:.2f}Hz; 窗口={frame_size / tnc.sample_rate * 1000:.1f}ms"
+        peak_note = f"{protection_label}; {resolution_note}; boost缩放={boost_scale * 100:.1f}%; 峰值 {input_peak:.3f}->{output_peak:.3f}"
         slope_rows = [
             {
                 "kind": "ANC 斜率",

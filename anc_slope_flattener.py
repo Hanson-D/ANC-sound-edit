@@ -392,6 +392,9 @@ def write_report_html(
     end_depth_reduction_db: float,
     start_transition_hz: float,
     end_transition_hz: float,
+    sample_rate: int,
+    frame_size: int,
+    hop_size: int,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     freqs = curves["freq_hz"]
@@ -433,6 +436,9 @@ def write_report_html(
             f"Input peak: <strong>{input_peak:.4f}</strong>; output peak: <strong>{output_peak:.4f}</strong>. "
             f"If output peak exceeds 1.0, the exported 16-bit WAV may clip.</p>"
         )
+    frequency_resolution_hz = sample_rate / frame_size
+    window_ms = frame_size / sample_rate * 1000.0
+    hop_ms = hop_size / sample_rate * 1000.0
     svg = svg_path.read_text(encoding="utf-8")
     html_text = f"""<!doctype html>
 <html lang="en">
@@ -456,6 +462,7 @@ code {{ background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }}
 <p>ANC definition: <code>PNC_dB - TNC_dB</code>. Replacement range: <strong>{start_hz:g}-{end_hz:g} Hz</strong>. Mode: <strong>{html.escape(mode)}</strong>.</p>
 <p>Endpoint depth reduction: start <strong>{start_depth_reduction_db:g} dB</strong>, end <strong>{end_depth_reduction_db:g} dB</strong>. A positive value makes the ANC depth shallower at that endpoint before smoothing.</p>
 <p>Transition width: start side <strong>{start_transition_hz:g} Hz</strong>, end side <strong>{end_transition_hz:g} Hz</strong>. These transition bands smooth the connection back to the original ANC curve.</p>
+<p>STFT settings: sample rate <strong>{sample_rate:g} Hz</strong>, FFT size <strong>{frame_size}</strong>, hop size <strong>{hop_size}</strong>. Frequency resolution is <strong>{frequency_resolution_hz:.3f} Hz/bin</strong>; analysis window is <strong>{window_ms:.1f} ms</strong>; frame step is <strong>{hop_ms:.1f} ms</strong>.</p>
 {clip_note}
 <p>Because start and end values are fixed, average slope is mostly a reference. The main steepness checks are max local slope, p95 local slope, effective transition width, and concentration ratio.</p>
 <h2>Files</h2>
@@ -563,6 +570,9 @@ def main() -> None:
         args.end_depth_reduction_db,
         args.start_transition_hz,
         args.end_transition_hz,
+        tnc.sample_rate,
+        args.frame_size,
+        args.hop_size,
     )
 
     freqs = curves["freq_hz"]
