@@ -278,6 +278,7 @@ class AncReboundGui(tk.Tk):
         tabs.add(self.log_frame, text="日志")
 
         self.summary.rowconfigure(0, weight=1)
+        self.summary.rowconfigure(2, weight=0)
         self.summary.columnconfigure(0, weight=1)
         columns = ("kind", "margin", "source", "count", "duration", "max_db", "mean_db", "extra")
         self.metrics_table = ttk.Treeview(self.summary, columns=columns, show="headings")
@@ -298,6 +299,17 @@ class AncReboundGui(tk.Tk):
         scrollbar = ttk.Scrollbar(self.summary, orient=tk.VERTICAL, command=self.metrics_table.yview)
         scrollbar.grid(row=0, column=1, sticky="ns")
         self.metrics_table.configure(yscrollcommand=scrollbar.set)
+        self.metric_help_var = tk.StringVar(value="运行任务后，这里会显示当前指标表各列的含义。")
+        ttk.Label(self.summary, text="指标说明", font=("Segoe UI", 10, "bold")).grid(
+            row=1, column=0, sticky="w", pady=(10, 2)
+        )
+        ttk.Label(
+            self.summary,
+            textvariable=self.metric_help_var,
+            wraplength=760,
+            justify=tk.LEFT,
+            foreground="#374151",
+        ).grid(row=2, column=0, columnspan=2, sticky="ew")
 
         self.chart_frame.rowconfigure(0, weight=1)
         self.chart_frame.columnconfigure(0, weight=1)
@@ -895,8 +907,32 @@ class AncReboundGui(tk.Tk):
                     row["extra"],
                 ),
             )
+        self.metric_help_var.set(self.metric_help_text(result.get("mode", "")))
         self.last_chart = result.get("chart")
         self.redraw_last_chart()
+
+    def metric_help_text(self, mode: str) -> str:
+        if mode == "slope":
+            return (
+                "斜率指标：有效宽度=该段主要变化实际分布的频率宽度，越大表示下降更分散；"
+                "峰值/最大=最大局部斜率，表格中按 dB/10Hz 显示，越小说明局部越不陡；"
+                "平均/P95=P95 局部斜率，排除少数极端点后看整体陡峭程度；"
+                "集中度=最大局部斜率/平均绝对斜率，越大表示变化集中在很窄区域；"
+                "补充里会显示 FFT 频率间隔、分析窗时长、峰值保护状态和输出峰值。"
+            )
+        if mode == "control":
+            return (
+                "时域控制指标：次数=目标频段短窗 RMS 超过 PNC+Margin 的事件数，连续超限会合并为一次；"
+                "持续时间=所有超限事件累计时长；峰值/最大=最严重一次超限高出多少 dB；"
+                "平均/P95=所有正向超限窗口的平均超限 dB；补充里的最长=最长单次反弹持续时间。"
+            )
+        if mode == "analysis":
+            return (
+                "完整分析指标：频域行里，来源/频点=最严重反弹频点，峰值/最大=该频点 TNC 高于 PNC+Margin 的 dB，"
+                "平均/P95=选定频段内正向反弹的平均 dB，补充=被频域限幅修改的 STFT bin 数。"
+                "时域行含义同“时域控制”：次数、累计持续时间、最大超限、平均正向超限和最长事件。"
+            )
+        return "运行任务后，这里会显示当前指标表各列的含义。"
 
     def display_source_name(self, value: str) -> str:
         names = {
