@@ -125,6 +125,7 @@ def flatten_anc_slope(
     end_depth_reduction_db: float = 0.0,
     start_transition_hz: float = 0.0,
     end_transition_hz: float = 0.0,
+    protect_peaks: bool = False,
 ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
     end_hz = start_hz + length_hz
     freqs, pnc_db = mean_stft_magnitude_db(pnc_samples, sample_rate, frame_size, hop_size)
@@ -160,7 +161,7 @@ def flatten_anc_slope(
     peak_limit = max(input_peak, 1.0 - (1.0 / 32768.0))
     boost_scale = 1.0
     positive_gain = gain_db > 0
-    if output_peak > peak_limit and np.any(positive_gain):
+    if protect_peaks and output_peak > peak_limit and np.any(positive_gain):
         low, high = 0.0, 1.0
         best_output = apply_gain(np.where(positive_gain, 0.0, gain_db))
         for _ in range(18):
@@ -192,6 +193,7 @@ def flatten_anc_slope(
         "boost_scale": np.asarray([boost_scale], dtype=np.float64),
         "input_peak": np.asarray([input_peak], dtype=np.float64),
         "output_peak": np.asarray([float(np.max(np.abs(output))) if output.size else 0.0], dtype=np.float64),
+        "peak_protection_enabled": np.asarray([1.0 if protect_peaks else 0.0], dtype=np.float64),
     }
     return output, curves
 
@@ -413,14 +415,24 @@ def write_report_html(
     boost_scale = float(curves.get("boost_scale", np.asarray([1.0]))[0])
     input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
     output_peak = float(curves.get("output_peak", np.asarray([0.0]))[0])
-    clip_note = (
-        f"<p>Peak protection reduced positive boost to <strong>{boost_scale * 100:.1f}%</strong> "
-        f"to avoid creating new WAV clipping. Input peak: <strong>{input_peak:.4f}</strong>; "
-        f"output peak: <strong>{output_peak:.4f}</strong>.</p>"
-        if boost_scale < 0.999
-        else f"<p>Peak protection did not reduce positive boost. Input peak: <strong>{input_peak:.4f}</strong>; "
-        f"output peak: <strong>{output_peak:.4f}</strong>.</p>"
-    )
+    peak_protection_enabled = bool(float(curves.get("peak_protection_enabled", np.asarray([0.0]))[0]))
+    if peak_protection_enabled and boost_scale < 0.999:
+        clip_note = (
+            f"<p>Peak protection reduced positive boost to <strong>{boost_scale * 100:.1f}%</strong> "
+            f"to avoid creating new WAV clipping. Input peak: <strong>{input_peak:.4f}</strong>; "
+            f"output peak: <strong>{output_peak:.4f}</strong>.</p>"
+        )
+    elif peak_protection_enabled:
+        clip_note = (
+            f"<p>Peak protection was enabled but did not reduce positive boost. "
+            f"Input peak: <strong>{input_peak:.4f}</strong>; output peak: <strong>{output_peak:.4f}</strong>.</p>"
+        )
+    else:
+        clip_note = (
+            f"<p>Peak protection was disabled to prioritize ANC curve fitting. "
+            f"Input peak: <strong>{input_peak:.4f}</strong>; output peak: <strong>{output_peak:.4f}</strong>. "
+            f"If output peak exceeds 1.0, the exported 16-bit WAV may clip.</p>"
+        )
     svg = svg_path.read_text(encoding="utf-8")
     html_text = f"""<!doctype html>
 <html lang="en">
@@ -474,7 +486,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pnc", type=Path, required=True, help="PNC WAV, headphones on and ANC off")
     parser.add_argument("--tnc", type=Path, required=True, help="TNC WAV, headphones on and ANC on")
     parser.add_argument("--start-hz", type=float, required=True, help="start frequency of the replaced segment")
-    parser.add_argument("--length-hz", type=float, required=True, help="frequency length of the replaced segment")
+    parser.add_argument("--end-hz", type=float, default=None, help="end frequency of the replaced segment")
+    parser.add_argument("--length-hz", type=float, default=None, help="frequency length of the replaced segment; kept for compatibility")
     parser.add_argument("--mode", choices=["smoothstep", "linear"], default="smoothstep")
     parser.add_argument("--start-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the start point before smoothing")
     parser.add_argument("--end-depth-reduction-db", type=float, default=0.0, help="reduce ANC depth at the end point before smoothing")
@@ -485,13 +498,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hop-size", type=int, default=2048)
     parser.add_argument("--max-boost-db", type=float, default=18.0)
     parser.add_argument("--max-cut-db", type=float, default=18.0)
+    parser.add_argument("--protect-peaks", action="store_true", help="reduce positive boost if needed to avoid new WAV clipping")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    if args.start_hz < 0 or args.length_hz <= 0:
-        raise ValueError("--start-hz must be non-negative and --length-hz must be positive")
+    if args.start_hz < 0:
+        raise ValueError("--start-hz must be non-negative")
+    if args.end_hz is None and args.length_hz is None:
+        raise ValueError("provide --end-hz, or provide --length-hz for compatibility")
     if args.frame_size <= 0 or args.hop_size <= 0:
         raise ValueError("--frame-size and --hop-size must be positive")
     if args.start_transition_hz < 0 or args.end_transition_hz < 0:
@@ -500,7 +516,10 @@ def main() -> None:
     pnc = read_wav(args.pnc)
     tnc = read_wav(args.tnc)
     validate_pair(pnc, tnc)
-    end_hz = args.start_hz + args.length_hz
+    end_hz = args.end_hz if args.end_hz is not None else args.start_hz + args.length_hz
+    length_hz = end_hz - args.start_hz
+    if length_hz <= 0:
+        raise ValueError("--end-hz must be greater than --start-hz")
     if end_hz > tnc.sample_rate / 2:
         raise ValueError(f"selected end frequency cannot exceed Nyquist: {tnc.sample_rate / 2:g} Hz")
 
@@ -510,7 +529,7 @@ def main() -> None:
         tnc.samples,
         tnc.sample_rate,
         args.start_hz,
-        args.length_hz,
+        length_hz,
         args.mode,
         args.frame_size,
         args.hop_size,
@@ -520,6 +539,7 @@ def main() -> None:
         args.end_depth_reduction_db,
         args.start_transition_hz,
         args.end_transition_hz,
+        args.protect_peaks,
     )
 
     output_wav = unique_output_path(args.output_dir / "tnc_anc_slope_flattened.wav")

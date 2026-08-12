@@ -199,7 +199,7 @@ python3 anc_slope_flattener.py \
   --pnc pnc.wav \
   --tnc tnc.wav \
   --start-hz 30 \
-  --length-hz 50 \
+  --end-hz 80 \
   --start-depth-reduction-db 3 \
   --end-depth-reduction-db 0 \
   --start-transition-hz 10 \
@@ -209,6 +209,8 @@ python3 anc_slope_flattener.py \
 ```
 
 This replaces the ANC contribution segment from `30 Hz` to `80 Hz`.
+`--length-hz` is still accepted for older command lines, but `--end-hz` is the
+preferred way to define the replacement range.
 The endpoint reduction options first make the selected endpoint ANC depth
 shallower, then smooth between the adjusted endpoints. For example,
 `--start-depth-reduction-db 3` reduces the start point's ANC depth by 3 dB
@@ -216,6 +218,9 @@ before generating the replacement curve.
 `--start-transition-hz` and `--end-transition-hz` add smooth connection bands
 before and after the replaced segment, avoiding abrupt jumps when endpoint
 depth reduction is used.
+By default, the slope tool prioritizes matching the target ANC curve. Add
+`--protect-peaks` if you want positive TNC boost reduced automatically to avoid
+new WAV clipping.
 
 Main outputs:
 
@@ -224,7 +229,7 @@ Main outputs:
 - `anc_slope_curve.svg`: visual curve comparison.
 - `anc_slope_curve.csv`: per-frequency values inside the replaced range.
 
-For a fixed start frequency and length, the endpoint-defined average slope may
+For a fixed start and end frequency, the endpoint-defined average slope may
 not change much. The report therefore focuses on max local slope, p95 local
 slope, effective transition width, and concentration ratio, which better
 describe whether the drop is concentrated in a narrow part of the selected band.

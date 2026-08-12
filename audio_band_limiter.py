@@ -195,7 +195,7 @@ def istft(spectrum: np.ndarray, frame_size: int, hop_size: int, length: int) -> 
         output[start : start + frame_size] += frame * window
         window_sum[start : start + frame_size] += window * window
 
-    valid = window_sum > EPS
+    valid = window_sum > max(EPS, float(np.max(window_sum)) * 1e-6)
     output[valid] /= window_sum[valid]
     return output[:length]
 

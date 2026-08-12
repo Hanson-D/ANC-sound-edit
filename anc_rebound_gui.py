@@ -81,12 +81,13 @@ class AncReboundGui(tk.Tk):
         self.safety_var = tk.StringVar(value="0")
         self.max_atten_var = tk.StringVar(value="18")
         self.slope_start_var = tk.StringVar(value="30")
-        self.slope_length_var = tk.StringVar(value="50")
+        self.slope_end_var = tk.StringVar(value="80")
         self.slope_mode_var = tk.StringVar(value="平缓")
         self.slope_start_reduction_var = tk.StringVar(value="0")
         self.slope_end_reduction_var = tk.StringVar(value="0")
         self.slope_start_transition_var = tk.StringVar(value="10")
         self.slope_end_transition_var = tk.StringVar(value="10")
+        self.slope_peak_protection_var = tk.BooleanVar(value=False)
         self.status_var = tk.StringVar(value="就绪")
         self.last_output_dir: Path | None = None
 
@@ -195,7 +196,7 @@ class AncReboundGui(tk.Tk):
             "用途：按频率定义 ANC=PNC(dB)-TNC(dB)，重塑选定频段内的 ANC 降噪量斜率。需要 PNC、TNC。",
         )
         self._entry(slope, 1, 0, "起始频率 Hz", self.slope_start_var)
-        self._entry(slope, 1, 2, "替代长度 Hz", self.slope_length_var)
+        self._entry(slope, 1, 2, "终点频率 Hz", self.slope_end_var)
         self._entry(slope, 2, 0, "起点压浅 dB", self.slope_start_reduction_var)
         self._entry(slope, 2, 2, "终点压浅 dB", self.slope_end_reduction_var)
         self._entry(slope, 3, 0, "起点过渡 Hz", self.slope_start_transition_var)
@@ -208,6 +209,9 @@ class AncReboundGui(tk.Tk):
             width=9,
             state="readonly",
         ).grid(row=4, column=1, sticky="ew", pady=4)
+        ttk.Checkbutton(slope, text="峰值保护", variable=self.slope_peak_protection_var).grid(
+            row=4, column=2, columnspan=2, sticky="w", pady=4
+        )
         ttk.Button(slope, text="运行 ANC 斜率平滑", command=self.run_slope_flattening).grid(
             row=5, column=0, columnspan=4, sticky="ew", pady=(12, 0)
         )
@@ -216,10 +220,11 @@ class AncReboundGui(tk.Tk):
             6,
             [
                 ("起始频率 Hz", "要替换的 ANC 降噪量曲线片段起点。计算仍用 ANC=PNC(dB)-TNC(dB)，界面显示为负值降噪。"),
-                ("替代长度 Hz", "从起始频率往后的替代宽度。例如起始 30、长度 50 表示替换 30-80 Hz。"),
+                ("终点频率 Hz", "要替换的 ANC 降噪量曲线片段终点。例如起始 30、终点 80 表示替换 30-80 Hz。"),
                 ("起点/终点压浅 dB", "先把端点 ANC 深度减少指定 dB，再做平滑。起点填 3 表示起点先少 3 dB 降噪深度，会改变整体斜率。"),
                 ("起点/终点过渡 Hz", "在主替代段前后增加平滑接入/接出宽度，避免端点压浅造成突变。0 表示不加额外过渡。"),
                 ("平滑模式", "平缓：首尾更顺，默认建议；线性：端点之间直线过渡。"),
+                ("峰值保护", "关闭时优先让实际 ANC 曲线贴近目标；打开时会收缩正向 boost 来避免导出 WAV 爆峰。"),
                 ("输出 WAV", "PNC 不动，通过缩放 TNC 频谱幅度生成新的 TNC，用来让 ANC 曲线在该段更平缓。"),
                 ("斜率指标", "重点看最大局部斜率、P95 局部斜率、有效宽度和集中度；平均斜率受端点约束，不是主要判断。"),
             ],
@@ -563,11 +568,15 @@ class AncReboundGui(tk.Tk):
     def _run_slope_flattening(self) -> dict:
         params = self.read_common_params()
         start_hz = float(self.slope_start_var.get())
-        length_hz = float(self.slope_length_var.get())
+        end_hz = float(self.slope_end_var.get())
+        if end_hz <= start_hz:
+            raise ValueError("斜率平滑的终点频率必须大于起始频率")
+        length_hz = end_hz - start_hz
         start_depth_reduction_db = float(self.slope_start_reduction_var.get())
         end_depth_reduction_db = float(self.slope_end_reduction_var.get())
         start_transition_hz = float(self.slope_start_transition_var.get())
         end_transition_hz = float(self.slope_end_transition_var.get())
+        protect_peaks = bool(self.slope_peak_protection_var.get())
         mode_label = self.slope_mode_var.get()
         mode = self.slope_mode_value()
         pnc = read_wav(Path(self.pnc_var.get()))
@@ -592,8 +601,8 @@ class AncReboundGui(tk.Tk):
             end_depth_reduction_db,
             start_transition_hz,
             end_transition_hz,
+            protect_peaks,
         )
-        end_hz = start_hz + length_hz
         output_wav = unique_output_path(out_dir / "tnc_anc_slope_flattened.wav")
         csv_path = unique_output_path(out_dir / "anc_slope_curve.csv")
         svg_path = unique_output_path(out_dir / "anc_slope_curve.svg")
@@ -649,7 +658,8 @@ class AncReboundGui(tk.Tk):
         boost_scale = float(curves.get("boost_scale", np.asarray([1.0]))[0])
         input_peak = float(curves.get("input_peak", np.asarray([0.0]))[0])
         output_peak = float(curves.get("output_peak", np.asarray([0.0]))[0])
-        peak_note = f"boost缩放={boost_scale * 100:.1f}%; 峰值 {input_peak:.3f}->{output_peak:.3f}"
+        protection_label = "峰值保护开" if protect_peaks else "峰值保护关"
+        peak_note = f"{protection_label}; boost缩放={boost_scale * 100:.1f}%; 峰值 {input_peak:.3f}->{output_peak:.3f}"
         slope_rows = [
             {
                 "kind": "ANC 斜率",
